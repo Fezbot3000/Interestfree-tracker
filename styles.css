@@ -1,0 +1,608 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Dark theme colors */
+    --background: #1a1a1a;
+    --surface: #242424;
+    --surface-light: #2d2d2d;
+    --on-background: #ffffff;
+    --on-surface: #f0f0f0;
+    --primary: #86efac;
+    --primary-dark: #4ade80;
+    --on-primary: #0a3622;
+    --secondary: #ffcaca;
+    --secondary-light: #ffdada;
+    --tertiary: #ffd699;
+    --error: #ff6b6b;
+    --success: #4ade80;
+    
+    /* Accent colors */
+    --accent-green: #86efac;
+    --accent-pink: #ffcaca;
+    --accent-yellow: #ffd699;
+    --accent-blue: #a5d8ff;
+    
+    /* Text colors */
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-hint: #808080;
+    
+    /* Spacing */
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 24px;
+    --spacing-6: 32px;
+    
+    /* Border radius */
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --radius-xl: 36px;
+    --radius-full: 9999px;
+}
+
+body {
+    font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    background-color: var(--background);
+    color: var(--on-background);
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--spacing-5);
+}
+
+/* Header */
+header {
+    background-color: var(--surface);
+    color: var(--on-surface);
+    padding: var(--spacing-5);
+    margin-bottom: var(--spacing-5);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.25px;
+    margin: 0;
+}
+
+header .app-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    margin: 0;
+}
+
+#export-data-btn {
+    background-color: var(--accent-green);
+    color: var(--on-primary);
+    font-weight: 500;
+    padding: var(--spacing-3) var(--spacing-5);
+}
+
+#import-data-btn {
+    background-color: var(--accent-yellow);
+    color: #664500;
+    font-weight: 500;
+    padding: var(--spacing-3) var(--spacing-5);
+}
+
+/* New Period Controls */
+.new-period-controls {
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-5);
+    margin-bottom: var(--spacing-5);
+}
+
+.custom-period-form {
+    margin-top: var(--spacing-4);
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-4);
+    gap: var(--spacing-4);
+}
+
+.form-row label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.form-row input {
+    padding: var(--spacing-3);
+    border: 1px solid #3a3a3a;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-light);
+    color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    flex: 1;
+}
+
+.form-row input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.2);
+}
+
+/* Buttons */
+button {
+    background-color: var(--surface-light);
+    color: var(--text-primary);
+    border: none;
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.25px;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #3a3a3a;
+}
+
+button:active {
+    background-color: #444444;
+}
+
+#create-custom-period-btn {
+    background-color: var(--accent-green);
+    color: var(--on-primary);
+    padding: var(--spacing-3) var(--spacing-5);
+    margin-left: auto;
+    font-weight: 500;
+}
+
+#create-custom-period-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+#add-period-btn {
+    background-color: var(--accent-green);
+    color: var(--on-primary);
+    margin-bottom: var(--spacing-4);
+    font-weight: 500;
+    padding: var(--spacing-3) var(--spacing-5);
+}
+
+#add-period-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Billing Periods Container */
+#billing-periods {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+}
+
+/* Billing Period */
+.billing-period {
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-5);
+    transition: box-shadow 0.2s;
+    margin-bottom: var(--spacing-5);
+}
+
+.billing-period:hover {
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+}
+
+.billing-period h2 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 500;
+    position: relative;
+}
+
+/* Header container with edit button */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.header-container h2 {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* Edit button */
+.edit-period-btn {
+    background-color: var(--accent-yellow);
+    color: #664500;
+    margin-left: auto;
+    font-weight: 500;
+    padding: var(--spacing-2) var(--spacing-3);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    font-size: 0.8rem;
+}
+
+.edit-period-btn:hover {
+    background-color: #ffc966;
+}
+
+/* Edit icon */
+.edit-icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'%3E%3C/path%3E%3Cpath d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'%3E%3C/path%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'%3E%3C/path%3E%3Cpath d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'%3E%3C/path%3E%3C/svg%3E");
+    mask-size: cover;
+    -webkit-mask-size: cover;
+}
+
+/* New period-info section */
+.period-info {
+    margin-bottom: var(--spacing-4);
+    padding: var(--spacing-4);
+    background-color: var(--surface-light);
+    border-radius: var(--radius-md);
+    color: var(--accent-green);
+    font-weight: 500;
+}
+
+.period-info p {
+    margin: 0;
+}
+
+/* Updated period-details section */
+.period-details {
+    margin-bottom: var(--spacing-5);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-3);
+    background-color: var(--surface-light);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-md);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.detail-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Period Actions */
+.period-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-5);
+    margin-top: var(--spacing-4);
+    flex-wrap: wrap;
+}
+
+/* App Actions */
+.app-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--spacing-5);
+    gap: var(--spacing-3);
+}
+
+/* Transactions Table */
+.transactions-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: var(--spacing-4);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.transactions-table th,
+.transactions-table td {
+    padding: var(--spacing-3) var(--spacing-4);
+    text-align: left;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.transactions-table th {
+    background-color: #2a2a2a;
+    font-weight: 500;
+    color: var(--text-secondary);
+    position: sticky;
+    top: 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: var(--spacing-4);
+}
+
+.transactions-table tbody tr {
+    background-color: var(--surface);
+    transition: background-color 0.2s;
+}
+
+.transactions-table tbody tr:hover {
+    background-color: var(--surface-light);
+}
+
+.transactions-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Action Buttons */
+.add-transaction-btn {
+    background-color: var(--accent-green);
+    color: var(--on-primary);
+    font-weight: 500;
+    padding: var(--spacing-3) var(--spacing-5);
+}
+
+.add-transaction-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.add-repayment-btn {
+    background-color: var(--accent-blue);
+    color: #0c344d;
+    font-weight: 500;
+    padding: var(--spacing-3) var(--spacing-5);
+}
+
+.add-repayment-btn:hover {
+    background-color: #8ac5f2;
+}
+
+#export-data-btn {
+    background-color: var(--accent-green);
+    color: var(--on-primary);
+}
+
+#export-data-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+#import-data-btn {
+    background-color: var(--accent-yellow);
+    color: #664500;
+}
+
+#import-data-btn:hover {
+    background-color: #ffc966;
+}
+
+/* Delete Button */
+.delete-transaction-btn {
+    background-color: var(--error);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+.delete-transaction-btn:hover {
+    background-color: #e74c4c;
+}
+
+.delete-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: var(--surface);
+    margin: 10% auto;
+    padding: var(--spacing-5);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-modal {
+    color: var(--text-secondary);
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: var(--text-primary);
+}
+
+/* Transaction Form */
+#transaction-form,
+#payment-form,
+#edit-period-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-4);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-2);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: var(--spacing-3);
+    border: 1px solid #3a3a3a;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-light);
+    color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.2);
+}
+
+#transaction-form button[type="submit"],
+#payment-form button[type="submit"],
+#edit-period-form button[type="submit"] {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    align-self: flex-end;
+    padding: var(--spacing-3) var(--spacing-4);
+    font-weight: 500;
+    border-radius: var(--radius-full);
+}
+
+/* Transactions display */
+.transactions-table tr td:nth-child(3) {
+    font-weight: 600;
+}
+
+.transactions-table tr td:nth-child(3)[data-type="expense"] {
+    color: var(--error); /* Red for expenses */
+}
+
+.transactions-table tr td:nth-child(3)[data-type="repayment"] {
+    color: var(--success); /* Green for repayments */
+}
+
+/* Action buttons at the top level */
+.app-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--spacing-5);
+    gap: var(--spacing-3);
+}
+
+/* File input is visually hidden but still accessible */
+#import-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: var(--spacing-4);
+    }
+
+    .new-period-controls {
+        padding: var(--spacing-4);
+    }
+
+    .billing-period {
+        padding: var(--spacing-4);
+    }
+
+    .custom-period-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .custom-period-form label {
+        margin-top: var(--spacing-3);
+    }
+
+    .custom-period-form input {
+        width: 100%;
+    }
+
+    .period-actions {
+        flex-direction: column;
+    }
+    
+    .period-actions button {
+        width: 100%;
+    }
+
+    .transactions-table th, 
+    .transactions-table td {
+        padding: var(--spacing-2) var(--spacing-3);
+        font-size: 0.9rem;
+    }
+    
+    .modal-content {
+        margin: 5% auto;
+        width: 95%;
+        padding: var(--spacing-4);
+    }
+}

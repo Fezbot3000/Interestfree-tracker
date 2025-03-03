@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interest-Free Period Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Interest-Free Period Tracker</h1>
+            <div class="app-actions">
+                <button id="export-data-btn">Export</button>
+                <button id="import-data-btn">Import</button>
+                <input type="file" id="import-file" accept=".json">
+            </div>
+        </header>
+
+        <div class="new-period-controls">
+            <button id="add-period-btn">Add New Billing Period</button>
+
+            <div class="custom-period-form">
+                <div class="form-row">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date">
+
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date">
+                </div>
+
+                <div class="form-row">
+                    <label for="interest-free-days">Interest-Free Days:</label>
+                    <input type="number" id="interest-free-days" value="55" min="0">
+                
+                    <button id="create-custom-period-btn">Create Custom Period</button>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <section id="billing-periods">
+                <!-- Billing periods will be dynamically added here -->
+            </section>
+
+            <div id="transaction-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h2>Add New Transaction</h2>
+                    <form id="transaction-form">
+                        <div class="form-group">
+                            <label for="transaction-date">Date</label>
+                            <input type="date" id="transaction-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transaction-amount">Amount ($)</label>
+                            <input type="number" id="transaction-amount" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transaction-description">Description</label>
+                            <input type="text" id="transaction-description">
+                        </div>
+                        <button type="submit">Add Transaction</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="payment-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h2>Add New Payment</h2>
+                    <form id="payment-form">
+                        <div class="form-group">
+                            <label for="payment-date">Date</label>
+                            <input type="date" id="payment-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment-amount">Amount ($)</label>
+                            <input type="number" id="payment-amount" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="payment-description">Description</label>
+                            <input type="text" id="payment-description">
+                        </div>
+                        <button type="submit">Add Payment</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="edit-period-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h2>Edit Billing Period</h2>
+                    <form id="edit-period-form">
+                        <div class="form-group">
+                            <label for="edit-start-date">Start Date</label>
+                            <input type="date" id="edit-start-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-end-date">End Date</label>
+                            <input type="date" id="edit-end-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-interest-free-days">Interest-Free Days</label>
+                            <input type="number" id="edit-interest-free-days" min="0" required>
+                        </div>
+                        <button type="submit">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
