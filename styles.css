@@ -6,31 +6,29 @@
 }
 
 :root {
-    /* Dark theme colors */
-    --background: #1a1a1a;
-    --surface: #242424;
-    --surface-light: #2d2d2d;
-    --on-background: #ffffff;
-    --on-surface: #f0f0f0;
-    --primary: #86efac;
-    --primary-dark: #4ade80;
-    --on-primary: #0a3622;
-    --secondary: #ffcaca;
-    --secondary-light: #ffdada;
-    --tertiary: #ffd699;
-    --error: #ff6b6b;
-    --success: #4ade80;
+    /* Modern color palette inspired by Finline */
+    --background: #f5f7fa;
+    --surface: #ffffff;
+    --surface-light: #f9fafc;
+    --on-background: #1e2329;
+    --on-surface: #1e2329;
+    --primary: #7b61ff;
+    --primary-dark: #6a52e5;
+    --on-primary: #ffffff;
+    --secondary: #f6f6f9;
+    --positive: #00c076;
+    --negative: #ff5353;
+    --neutral: #808a9d;
     
-    /* Accent colors */
-    --accent-green: #86efac;
-    --accent-pink: #ffcaca;
-    --accent-yellow: #ffd699;
-    --accent-blue: #a5d8ff;
+    /* Investment app colors */
+    --crypto-color: #7b61ff;
+    --stocks-color: #7b61ff;
+    --warning-color: #ffa726;
     
     /* Text colors */
-    --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --text-hint: #808080;
+    --text-primary: #1e2329;
+    --text-secondary: #58667e;
+    --text-hint: #a6b0c3;
     
     /* Spacing */
     --spacing-1: 4px;
@@ -41,19 +39,24 @@
     --spacing-6: 32px;
     
     /* Border radius */
-    --radius-sm: 12px;
-    --radius-md: 20px;
-    --radius-lg: 28px;
-    --radius-xl: 36px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
     --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+    --shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
 }
 
 body {
     font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    line-height: 1.6;
+    line-height: 1.5;
     background-color: var(--background);
     color: var(--on-background);
-    max-width: 1100px;
+    max-width: 800px;
     margin: 0 auto;
     padding: var(--spacing-5);
 }
@@ -65,7 +68,7 @@ header {
     padding: var(--spacing-5);
     margin-bottom: var(--spacing-5);
     border-radius: var(--radius-md);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -74,7 +77,7 @@ header {
 header h1 {
     font-size: 1.5rem;
     font-weight: 600;
-    letter-spacing: 0.25px;
+    letter-spacing: -0.02em;
     margin: 0;
 }
 
@@ -84,25 +87,28 @@ header .app-actions {
     margin: 0;
 }
 
-#export-data-btn {
-    background-color: var(--accent-green);
-    color: var(--on-primary);
+/* Action Buttons */
+#export-data-btn, #import-data-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary);
+    color: var(--on-background);
     font-weight: 500;
-    padding: var(--spacing-3) var(--spacing-5);
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
 }
 
-#import-data-btn {
-    background-color: var(--accent-yellow);
-    color: #664500;
-    font-weight: 500;
-    padding: var(--spacing-3) var(--spacing-5);
+#export-data-btn:hover, #import-data-btn:hover {
+    background-color: #ecedf1;
 }
 
 /* New Period Controls */
 .new-period-controls {
     background-color: var(--surface);
     border-radius: var(--radius-md);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-md);
     padding: var(--spacing-5);
     margin-bottom: var(--spacing-5);
 }
@@ -116,19 +122,21 @@ header .app-actions {
     align-items: center;
     margin-bottom: var(--spacing-4);
     gap: var(--spacing-4);
+    flex-wrap: wrap;
 }
 
 .form-row label {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 500;
     white-space: nowrap;
 }
 
 .form-row input {
     padding: var(--spacing-3);
-    border: 1px solid #3a3a3a;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-sm);
-    background-color: var(--surface-light);
+    background-color: var(--surface);
     color: var(--text-primary);
     transition: border-color 0.2s, box-shadow 0.2s;
     flex: 1;
@@ -137,52 +145,43 @@ header .app-actions {
 .form-row input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.2);
+    box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
 }
 
 /* Buttons */
 button {
-    background-color: var(--surface-light);
+    background-color: var(--secondary);
     color: var(--text-primary);
     border: none;
     padding: var(--spacing-3) var(--spacing-4);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-full);
     cursor: pointer;
     font-weight: 500;
     font-size: 0.875rem;
-    letter-spacing: 0.25px;
+    letter-spacing: -0.01em;
     transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
 }
 
 button:hover {
-    background-color: #3a3a3a;
+    background-color: #ecedf1;
 }
 
 button:active {
-    background-color: #444444;
+    background-color: #e4e5eb;
 }
 
-#create-custom-period-btn {
-    background-color: var(--accent-green);
+#create-custom-period-btn, #add-period-btn {
+    background-color: var(--primary);
     color: var(--on-primary);
-    padding: var(--spacing-3) var(--spacing-5);
-    margin-left: auto;
-    font-weight: 500;
-}
-
-#create-custom-period-btn:hover {
-    background-color: var(--primary-dark);
-}
-
-#add-period-btn {
-    background-color: var(--accent-green);
-    color: var(--on-primary);
-    margin-bottom: var(--spacing-4);
     font-weight: 500;
     padding: var(--spacing-3) var(--spacing-5);
 }
 
-#add-period-btn:hover {
+#create-custom-period-btn:hover, #add-period-btn:hover {
     background-color: var(--primary-dark);
 }
 
@@ -190,28 +189,22 @@ button:active {
 #billing-periods {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-6);
+    gap: var(--spacing-5);
 }
 
 /* Billing Period */
 .billing-period {
     background-color: var(--surface);
     border-radius: var(--radius-md);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-md);
     padding: var(--spacing-5);
     transition: box-shadow 0.2s;
     margin-bottom: var(--spacing-5);
+    overflow: hidden;
 }
 
 .billing-period:hover {
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
-}
-
-.billing-period h2 {
-    color: var(--text-primary);
-    font-size: 1.25rem;
-    font-weight: 500;
-    position: relative;
+    box-shadow: var(--shadow-lg);
 }
 
 /* Header container with edit button */
@@ -221,21 +214,31 @@ button:active {
     align-items: center;
     padding-bottom: var(--spacing-3);
     margin-bottom: var(--spacing-4);
-    border-bottom: 1px solid #3a3a3a;
+    border-bottom: 1px solid #f0f0f5;
 }
 
 .header-container h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
+    color: var(--text-primary);
+}
+
+.header-container h2 span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: var(--spacing-2);
 }
 
 /* Edit button */
 .edit-period-btn {
-    background-color: var(--accent-yellow);
-    color: #664500;
-    margin-left: auto;
-    font-weight: 500;
+    background-color: var(--secondary);
+    color: var(--text-primary);
+    border-radius: var(--radius-full);
     padding: var(--spacing-2) var(--spacing-3);
     display: flex;
     align-items: center;
@@ -244,7 +247,7 @@ button:active {
 }
 
 .edit-period-btn:hover {
-    background-color: #ffc966;
+    background-color: #ecedf1;
 }
 
 /* Edit icon */
@@ -259,26 +262,27 @@ button:active {
     -webkit-mask-size: cover;
 }
 
-/* New period-info section */
+/* Interest-free period info section */
 .period-info {
-    margin-bottom: var(--spacing-4);
     padding: var(--spacing-4);
     background-color: var(--surface-light);
     border-radius: var(--radius-md);
-    color: var(--accent-green);
-    font-weight: 500;
+    margin-bottom: var(--spacing-4);
 }
 
 .period-info p {
     margin: 0;
+    color: var(--positive);
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
-/* Updated period-details section */
+/* Period details section */
 .period-details {
-    margin-bottom: var(--spacing-5);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--spacing-3);
+    margin-bottom: var(--spacing-5);
     background-color: var(--surface-light);
     padding: var(--spacing-4);
     border-radius: var(--radius-md);
@@ -287,18 +291,20 @@ button:active {
 .detail-item {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-2);
+    gap: var(--spacing-1);
 }
 
 .detail-label {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
 .detail-value {
     color: var(--text-primary);
-    font-size: 1.1rem;
-    font-weight: 500;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
 }
 
 /* Period Actions */
@@ -306,16 +312,7 @@ button:active {
     display: flex;
     gap: var(--spacing-3);
     margin-bottom: var(--spacing-5);
-    margin-top: var(--spacing-4);
     flex-wrap: wrap;
-}
-
-/* App Actions */
-.app-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: var(--spacing-5);
-    gap: var(--spacing-3);
 }
 
 /* Transactions Table */
@@ -323,28 +320,25 @@ button:active {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-top: var(--spacing-4);
     border-radius: var(--radius-md);
     overflow: hidden;
+    margin-top: var(--spacing-4);
 }
 
 .transactions-table th,
 .transactions-table td {
     padding: var(--spacing-3) var(--spacing-4);
     text-align: left;
-    border-bottom: 1px solid #3a3a3a;
+    border-bottom: 1px solid #f0f0f5;
 }
 
 .transactions-table th {
-    background-color: #2a2a2a;
+    background-color: var(--surface-light);
     font-weight: 500;
     color: var(--text-secondary);
-    position: sticky;
-    top: 0;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: var(--spacing-4);
 }
 
 .transactions-table tbody tr {
@@ -360,12 +354,16 @@ button:active {
     border-bottom: none;
 }
 
-/* Action Buttons */
-.add-transaction-btn {
-    background-color: var(--accent-green);
-    color: var(--on-primary);
+/* Transaction actions */
+.add-transaction-btn, .add-repayment-btn {
+    border-radius: var(--radius-full);
     font-weight: 500;
     padding: var(--spacing-3) var(--spacing-5);
+}
+
+.add-transaction-btn {
+    background-color: var(--primary);
+    color: var(--on-primary);
 }
 
 .add-transaction-btn:hover {
@@ -373,42 +371,36 @@ button:active {
 }
 
 .add-repayment-btn {
-    background-color: var(--accent-blue);
-    color: #0c344d;
-    font-weight: 500;
-    padding: var(--spacing-3) var(--spacing-5);
+    background-color: var(--secondary);
+    color: var(--on-background);
 }
 
 .add-repayment-btn:hover {
-    background-color: #8ac5f2;
+    background-color: #ecedf1;
 }
 
-#export-data-btn {
-    background-color: var(--accent-green);
-    color: var(--on-primary);
+/* Transaction amounts */
+.transactions-table tr td:nth-child(3) {
+    font-weight: 600;
+    text-align: right;
 }
 
-#export-data-btn:hover {
-    background-color: var(--primary-dark);
+.transactions-table tr td:nth-child(3)[data-type="expense"] {
+    color: var(--negative);
 }
 
-#import-data-btn {
-    background-color: var(--accent-yellow);
-    color: #664500;
-}
-
-#import-data-btn:hover {
-    background-color: #ffc966;
+.transactions-table tr td:nth-child(3)[data-type="repayment"] {
+    color: var(--positive);
 }
 
 /* Delete Button */
 .delete-transaction-btn {
-    background-color: var(--error);
+    background-color: var(--negative);
     color: white;
     border: none;
-    border-radius: var(--radius-sm);
-    width: 28px;
-    height: 28px;
+    border-radius: var(--radius-full);
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -437,8 +429,8 @@ button:active {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
     animation: fadeIn 0.2s ease;
 }
 
@@ -449,18 +441,18 @@ button:active {
 
 .modal-content {
     background-color: var(--surface);
-    margin: 10% auto;
+    margin: 15% auto;
     padding: var(--spacing-5);
     border-radius: var(--radius-lg);
     width: 90%;
     max-width: 500px;
     position: relative;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-lg);
     animation: slideIn 0.3s ease;
 }
 
 @keyframes slideIn {
-    from { transform: translateY(-40px); opacity: 0; }
+    from { transform: translateY(-30px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
 
@@ -468,7 +460,7 @@ button:active {
     color: var(--text-secondary);
     float: right;
     font-size: 24px;
-    font-weight: bold;
+    font-weight: 500;
     cursor: pointer;
     transition: color 0.2s;
     line-height: 1;
@@ -478,7 +470,7 @@ button:active {
     color: var(--text-primary);
 }
 
-/* Transaction Form */
+/* Form styling */
 #transaction-form,
 #payment-form,
 #edit-period-form {
@@ -502,9 +494,9 @@ button:active {
 .form-group input {
     width: 100%;
     padding: var(--spacing-3);
-    border: 1px solid #3a3a3a;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-sm);
-    background-color: var(--surface-light);
+    background-color: var(--surface);
     color: var(--text-primary);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -512,7 +504,7 @@ button:active {
 .form-group input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.2);
+    box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
 }
 
 #transaction-form button[type="submit"],
@@ -524,27 +516,6 @@ button:active {
     padding: var(--spacing-3) var(--spacing-4);
     font-weight: 500;
     border-radius: var(--radius-full);
-}
-
-/* Transactions display */
-.transactions-table tr td:nth-child(3) {
-    font-weight: 600;
-}
-
-.transactions-table tr td:nth-child(3)[data-type="expense"] {
-    color: var(--error); /* Red for expenses */
-}
-
-.transactions-table tr td:nth-child(3)[data-type="repayment"] {
-    color: var(--success); /* Green for repayments */
-}
-
-/* Action buttons at the top level */
-.app-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: var(--spacing-5);
-    gap: var(--spacing-3);
 }
 
 /* File input is visually hidden but still accessible */
@@ -562,7 +533,7 @@ button:active {
 /* Responsive Design */
 @media (max-width: 768px) {
     body {
-        padding: var(--spacing-4);
+        padding: var(--spacing-3);
     }
 
     .new-period-controls {
@@ -573,16 +544,12 @@ button:active {
         padding: var(--spacing-4);
     }
 
-    .custom-period-form {
+    .form-row {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
     }
 
-    .custom-period-form label {
-        margin-top: var(--spacing-3);
-    }
-
-    .custom-period-form input {
+    .form-row input {
         width: 100%;
     }
 
@@ -597,12 +564,22 @@ button:active {
     .transactions-table th, 
     .transactions-table td {
         padding: var(--spacing-2) var(--spacing-3);
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     
     .modal-content {
-        margin: 5% auto;
+        margin: 10% auto;
         width: 95%;
         padding: var(--spacing-4);
+    }
+    
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-3);
+    }
+    
+    .edit-period-btn {
+        align-self: flex-start;
     }
 }
