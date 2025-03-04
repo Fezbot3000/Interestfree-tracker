@@ -3,6 +3,26 @@ function triggerImportDialog() {
     document.getElementById('importFileInput').click();
 }
 
+// Example of saving data
+function saveData() {
+  localStorage.setItem('billData', JSON.stringify(masterBills));
+  localStorage.setItem('payCycleData', JSON.stringify(payCycles));
+}
+
+// Example of loading data
+function loadData() {
+  const billData = localStorage.getItem('billData');
+  if (billData) {
+    masterBills = JSON.parse(billData);
+  }
+  
+  const cycleData = localStorage.getItem('payCycleData');
+  if (cycleData) {
+    payCycles = JSON.parse(cycleData);
+  }
+}
+
+
 // Import data from a JSON file
 function importData(event) {
     const file = event.target.files[0];
