@@ -302,7 +302,27 @@
         }
 
         renderTransactions(transactions, periodId) {
-            return transactions.map((transaction, index) => {
+            // Add original index to each transaction to preserve insertion order
+            const indexedTransactions = transactions.map((transaction, index) => ({
+                ...transaction,
+                originalIndex: index
+            }));
+            
+            // Sort transactions by date (newest first) and then by original insertion order
+            const sortedTransactions = [...indexedTransactions].sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                
+                // If dates are different, sort by date (newest first)
+                if (dateB.getTime() !== dateA.getTime()) {
+                    return dateB - dateA;
+                }
+                
+                // If dates are the same, preserve original order
+                return a.originalIndex - b.originalIndex;
+            });
+            
+            return sortedTransactions.map((transaction) => {
                 // Format the transaction date
                 const transactionDateObj = new Date(transaction.date);
                 const formattedDate = this.formatDate(transactionDateObj);
@@ -313,7 +333,7 @@
                     <td>${transaction.description}</td>
                     <td data-type="${transaction.type}">${transaction.type === 'repayment' ? '-$' : '$'}${Math.abs(parseFloat(transaction.amount)).toFixed(2)}</td>
                     <td>
-                        <button class="delete-transaction-btn" data-period-id="${periodId}" data-transaction-index="${index}">
+                        <button class="delete-transaction-btn" data-period-id="${periodId}" data-transaction-index="${transaction.originalIndex}">
                             <span class="delete-icon">×</span>
                         </button>
                     </td>
