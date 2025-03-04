@@ -110,26 +110,35 @@
             return savedPeriods ? JSON.parse(savedPeriods) : [];
         }
 
-        // Render existing billing periods when page loads
         renderExistingBillingPeriods() {
-            this.billingPeriodsContainer.innerHTML = '';
-            
-            // Ensure we're working with the latest data
-            this.billingPeriods = this.loadBillingPeriods();
-            
-            // Force recalculation of all remaining days
-            this.billingPeriods.forEach(period => {
-                const daysRemaining = this.calculateRemainingDays(period);
-                console.log(`Period ${period.startDate}: ${daysRemaining} days remaining`);
-            });
-            
-            // Sort periods by start date (newest first)
-            const sortedPeriods = [...this.billingPeriods].sort((a, b) => {
-                return new Date(b.startDate) - new Date(a.startDate);
-            });
-            
-            sortedPeriods.forEach(period => this.renderBillingPeriod(period));
-        }
+    this.billingPeriodsContainer.innerHTML = '';
+    
+    // Ensure we're working with the latest data
+    this.billingPeriods = this.loadBillingPeriods();
+    
+    // Force recalculation of all remaining days
+    this.billingPeriods.forEach(period => {
+        const daysRemaining = this.calculateRemainingDays(period);
+        console.log(`Period ${period.startDate}: ${daysRemaining} days remaining`);
+    });
+    
+    // Sort periods by start date (newest first)
+    const sortedPeriods = [...this.billingPeriods].sort((a, b) => {
+        // Convert strings to Date objects for comparison
+        const dateA = new Date(a.startDate);
+        const dateB = new Date(b.startDate);
+        
+        // Sort in descending order (most recent first)
+        return dateB - dateA;
+    });
+    
+    // Log the sorted periods for debugging
+    console.log("Periods sorted by date (newest first):", 
+        sortedPeriods.map(p => `${p.startDate} (${this.formatDate(new Date(p.startDate))})`));
+    
+    // Render each period in order
+    sortedPeriods.forEach(period => this.renderBillingPeriod(period));
+}
 
         setDefaultDates() {
             const startDate = new Date();
