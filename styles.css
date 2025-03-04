@@ -1,0 +1,635 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Modern color palette inspired by Finline */
+    --background: #f5f7fa;
+    --surface: #ffffff;
+    --surface-light: #f9fafc;
+    --on-background: #1e2329;
+    --on-surface: #1e2329;
+    --primary: #7b61ff;
+    --primary-dark: #6a52e5;
+    --on-primary: #ffffff;
+    --secondary: #f6f6f9;
+    --positive: #00c076;
+    --negative: #ff5353;
+    --neutral: #808a9d;
+    
+    /* Investment app colors */
+    --crypto-color: #7b61ff;
+    --stocks-color: #7b61ff;
+    --warning-color: #ffa726;
+    
+    /* Text colors */
+    --text-primary: #1e2329;
+    --text-secondary: #58667e;
+    --text-hint: #a6b0c3;
+    
+    /* Spacing */
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 24px;
+    --spacing-6: 32px;
+    
+    /* Border radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.1), 0 2px 4px -2px rgba(16, 24, 40, 0.06);
+    --shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
+}
+
+body {
+    font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    background-color: var(--background);
+    color: var(--on-background);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-5);
+}
+
+/* Header */
+header {
+    background-color: var(--surface);
+    color: var(--on-surface);
+    padding: var(--spacing-5);
+    margin-bottom: var(--spacing-5);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+header .app-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    margin: 0;
+}
+
+/* Action Buttons */
+#export-data-btn, #import-data-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary);
+    color: var(--on-background);
+    font-weight: 500;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+}
+
+#export-data-btn:hover, #import-data-btn:hover {
+    background-color: #ecedf1;
+}
+
+/* New Period Controls */
+.new-period-controls {
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-5);
+    margin-bottom: var(--spacing-5);
+}
+
+.custom-period-form {
+    margin-top: var(--spacing-4);
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-4);
+    gap: var(--spacing-4);
+    flex-wrap: wrap;
+}
+
+.form-row label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.form-row input {
+    padding: var(--spacing-3);
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface);
+    color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    flex: 1;
+}
+
+.form-row input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
+}
+
+/* Buttons */
+button {
+    background-color: var(--secondary);
+    color: var(--text-primary);
+    border: none;
+    padding: var(--spacing-3) var(--spacing-4);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: -0.01em;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
+}
+
+button:hover {
+    background-color: #ecedf1;
+}
+
+button:active {
+    background-color: #e4e5eb;
+}
+
+#create-custom-period-btn, #add-period-btn {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    font-weight: 500;
+    padding: var(--spacing-3) var(--spacing-5);
+}
+
+#create-custom-period-btn:hover, #add-period-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Billing Periods Container */
+#billing-periods {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-5);
+}
+
+/* Billing Period */
+.billing-period {
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-5);
+    transition: box-shadow 0.2s;
+    margin-bottom: var(--spacing-5);
+    overflow: hidden;
+}
+
+.billing-period:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* Header container with edit button */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-3);
+    margin-bottom: var(--spacing-4);
+    border-bottom: 1px solid #f0f0f5;
+}
+
+.header-container h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+    color: var(--text-primary);
+}
+
+.header-container h2 span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-left: var(--spacing-2);
+}
+
+/* Edit button */
+.edit-period-btn {
+    background-color: var(--secondary);
+    color: var(--text-primary);
+    border-radius: var(--radius-full);
+    padding: var(--spacing-2) var(--spacing-3);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    font-size: 0.8rem;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.edit-period-btn:hover {
+    background-color: #ecedf1;
+}
+
+/* Edit icon */
+.edit-icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'%3E%3C/path%3E%3Cpath d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'%3E%3C/path%3E%3C/svg%3E");
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'%3E%3C/path%3E%3Cpath d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'%3E%3C/path%3E%3C/svg%3E");
+    mask-size: cover;
+    -webkit-mask-size: cover;
+    pointer-events: none;
+}
+
+/* Interest-free period info section */
+.period-info {
+    padding: var(--spacing-4);
+    background-color: var(--surface-light);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-4);
+}
+
+.period-info p {
+    margin: 0;
+    color: var(--positive);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Period details section */
+.period-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-5);
+    background-color: var(--surface-light);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-md);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+}
+
+.detail-label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+/* Period Actions */
+.period-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-5);
+    flex-wrap: wrap;
+    pointer-events: auto;
+}
+
+/* Transactions Table */
+.transactions-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-top: var(--spacing-4);
+    pointer-events: auto;
+}
+
+.transactions-table th,
+.transactions-table td {
+    padding: var(--spacing-3) var(--spacing-4);
+    text-align: left;
+    border-bottom: 1px solid #f0f0f5;
+}
+
+.transactions-table th {
+    background-color: var(--surface-light);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.transactions-table tbody tr {
+    background-color: var(--surface);
+    transition: background-color 0.2s;
+}
+
+.transactions-table tbody tr:hover {
+    background-color: var(--surface-light);
+}
+
+.transactions-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Transaction actions */
+.add-transaction-btn, .add-repayment-btn {
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    padding: var(--spacing-3) var(--spacing-5);
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.add-transaction-btn {
+    background-color: var(--primary);
+    color: var(--on-primary);
+}
+
+.add-transaction-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.add-repayment-btn {
+    background-color: var(--secondary);
+    color: var(--on-background);
+}
+
+.add-repayment-btn:hover {
+    background-color: #ecedf1;
+}
+
+/* Transaction amounts */
+.transactions-table tr td:nth-child(3) {
+    font-weight: 600;
+    text-align: right;
+}
+
+.transactions-table tr td:nth-child(3)[data-type="expense"] {
+    color: var(--negative);
+}
+
+.transactions-table tr td:nth-child(3)[data-type="repayment"] {
+    color: var(--positive);
+}
+
+/* Delete Button */
+.delete-transaction-btn {
+    background-color: var(--negative);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+}
+
+.delete-transaction-btn:hover {
+    background-color: #e74c4c;
+}
+
+.delete-icon {
+    font-size: 1rem;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: var(--surface);
+    margin: 15% auto;
+    padding: var(--spacing-5);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-modal {
+    color: var(--text-secondary);
+    float: right;
+    font-size: 24px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    color: var(--text-primary);
+}
+
+/* Form styling */
+#transaction-form,
+#payment-form,
+#edit-period-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-4);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-2);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: var(--spacing-3);
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface);
+    color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
+}
+
+#transaction-form button[type="submit"],
+#payment-form button[type="submit"],
+#edit-period-form button[type="submit"] {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    align-self: flex-end;
+    padding: var(--spacing-3) var(--spacing-4);
+    font-weight: 500;
+    border-radius: var(--radius-full);
+}
+
+/* File input is visually hidden but still accessible */
+#import-file {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: var(--spacing-3);
+    }
+
+    .new-period-controls {
+        padding: var(--spacing-4);
+    }
+
+    .billing-period {
+        padding: var(--spacing-4);
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-row input {
+        width: 100%;
+    }
+
+    .period-actions {
+        flex-direction: column;
+    }
+    
+    .period-actions button {
+        width: 100%;
+    }
+
+    .transactions-table th, 
+    .transactions-table td {
+        padding: var(--spacing-2) var(--spacing-3);
+        font-size: 0.85rem;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+        padding: var(--spacing-4);
+    }
+    
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-3);
+    }
+    
+    .edit-period-btn {
+        align-self: flex-start;
+    }
+}
+
+/* Fix for all buttons to ensure they can receive clicks */
+button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Ensure child elements of buttons don't interfere with clicks */
+button > * {
+    pointer-events: none !important;
+}
+
+/* Specific fix for action buttons */
+.add-transaction-btn, 
+.add-repayment-btn, 
+.delete-transaction-btn {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* Ensure the transaction table allows clicks */
+.transactions-table {
+    pointer-events: auto !important;
+}
+
+/* Make sure delete buttons are clickable */
+.delete-transaction-btn .delete-icon {
+    pointer-events: none !important;
+}
+
+/* Ensure the button icons don't block clicks */
+.edit-icon {
+    pointer-events: none !important;
+}
