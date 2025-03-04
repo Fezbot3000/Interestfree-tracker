@@ -1,116 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interest-Free Period Tracker</title>
+    <title>Bill Management</title>
+    <!-- Favicon to prevent 404 error -->
+    <link rel="icon" href="data:,">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Link to external CSS file -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1>Interest-Free Period Tracker</h1>
-            <div class="app-actions">
-                <button id="export-data-btn">Export</button>
-                <button id="import-data-btn">Import</button>
-                <input type="file" id="import-file" accept=".json">
-            </div>
-        </header>
+    <!-- Dark/Light Mode Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <span id="themeIcon" class="material-icons-round">dark_mode</span>
+        <span id="themeText">Dark Mode</span>
+    </button>
 
-        <div class="new-period-controls">
-            <button id="add-period-btn">Add New Billing Period</button>
-
-            <div class="custom-period-form">
-                <div class="form-row">
-                    <label for="start-date">Start Date:</label>
-                    <input type="date" id="start-date">
-
-                    <label for="end-date">End Date:</label>
-                    <input type="date" id="end-date">
-                </div>
-
-                <div class="form-row">
-                    <label for="interest-free-days">Interest-Free Days:</label>
-                    <input type="number" id="interest-free-days" value="55" min="0">
-                
-                    <button id="create-custom-period-btn">Create Custom Period</button>
-                </div>
+    <div class="container">
+        <h1>Bill Management System</h1>
+        
+        <!-- Financial Chart Section -->
+        <div class="section">
+            <h2>Financial Overview</h2>
+            <div class="chart-container">
+                <canvas id="financialChart"></canvas>
             </div>
         </div>
-
-        <main>
-            <section id="billing-periods">
-                <!-- Billing periods will be dynamically added here -->
-            </section>
-
-            <div id="transaction-modal" class="modal">
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h2>Add New Transaction</h2>
-                    <form id="transaction-form">
-                        <div class="form-group">
-                            <label for="transaction-date">Date</label>
-                            <input type="date" id="transaction-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="transaction-amount">Amount ($)</label>
-                            <input type="number" id="transaction-amount" step="0.01" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="transaction-description">Description</label>
-                            <input type="text" id="transaction-description">
-                        </div>
-                        <button type="submit">Add Transaction</button>
-                    </form>
+        
+        <!-- Settings Container - Side by side on desktop, stacked on mobile -->
+        <div class="settings-container">
+            <!-- Set Pay Cycle Section -->
+            <div class="section pay-cycle-section">
+                <h2>Set Pay Cycle</h2>
+                <div class="form-group">
+                    <label for="payCycleStart">Start Date:</label>
+                    <input type='date' id='payCycleStart'>
+                </div>
+                
+                <div class="form-group">
+                    <label for="payCycleFrequency">Frequency:</label>
+                    <select id='payCycleFrequency'>
+                        <option value='Fortnightly'>Fortnightly</option>
+                        <option value='Monthly'>Monthly</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="payCycleIncome">Income per Pay Cycle:</label>
+                    <div class="input-with-prefix">
+                        <span class="input-prefix">$</span>
+                        <input type="number" step="0.01" id="payCycleIncome" placeholder="Enter income amount">
+                    </div>
+                </div>
+                
+                <button class="btn-filled" onclick='setPayCycle()'>Set Pay Cycle</button>
+                
+                <!-- Data Import/Export Section -->
+                <div class="data-management">
+                    <button class="data-btn" onclick="exportData()">
+                        <span class="material-icons-round">download</span> Export Data
+                    </button>
+                    <input type="file" id="importFileInput" accept=".json">
+                    <button class="data-btn import-btn" onclick="triggerImportDialog()">
+                        <span class="material-icons-round">upload</span> Import Data
+                    </button>
                 </div>
             </div>
-
-            <div id="payment-modal" class="modal">
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h2>Add New Payment</h2>
-                    <form id="payment-form">
-                        <div class="form-group">
-                            <label for="payment-date">Date</label>
-                            <input type="date" id="payment-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="payment-amount">Amount ($)</label>
-                            <input type="number" id="payment-amount" step="0.01" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="payment-description">Description</label>
-                            <input type="text" id="payment-description">
-                        </div>
-                        <button type="submit">Add Payment</button>
-                    </form>
+            
+            <!-- Add a New Bill Section -->
+            <div class="section add-bill-section">
+                <h2>Add a New Bill</h2>
+                <div class="form-group">
+                    <label for="billName">Name:</label>
+                    <input type="text" id="billName">
                 </div>
-            </div>
-
-            <div id="edit-period-modal" class="modal">
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h2>Edit Billing Period</h2>
-                    <form id="edit-period-form">
-                        <div class="form-group">
-                            <label for="edit-start-date">Start Date</label>
-                            <input type="date" id="edit-start-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-end-date">End Date</label>
-                            <input type="date" id="edit-end-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-interest-free-days">Interest-Free Days</label>
-                            <input type="number" id="edit-interest-free-days" min="0" required>
-                        </div>
-                        <button type="submit">Save Changes</button>
-                    </form>
+                
+                <div class="form-group">
+                    <label for="billAmount">Amount:</label>
+                    <div class="input-with-prefix">
+                        <span class="input-prefix">$</span>
+                        <input type="number" step="0.01" id="billAmount">
+                    </div>
                 </div>
+                
+                <div class="form-group">
+                    <label for="billDate">Date:</label>
+                    <input type="date" id="billDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="billFrequency">Frequency:</label>
+                    <select id="billFrequency">
+                        <option value="Monthly">Monthly</option>
+                        <option value="Fortnightly">Fortnightly</option>
+                        <option value="One-Off">One-Off</option>
+                        <option value="Yearly">Yearly</option>
+                        <option value="6-Monthly">6-Monthly</option>
+                        <option value="Custom">Custom...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="billGroup">Group:</label>
+                    <select id="billGroup">
+                        <option value="Group 1 - 2Up">Group 1 - 2Up</option>
+                        <option value="Group 2 - Shared Savings">Group 2 - Shared Savings</option>
+                        <option value="Group 3 - Latitude">Group 3 - Latitude</option>
+                        <option value="Group 4 - Cash Bills">Group 4 - Cash Bills</option>
+                    </select>
+                </div>
+                
+                <button class="btn-filled add-bill-btn" onclick="addBill()">
+                    <span class="material-icons-round">add</span> Add Bill
+                </button>
             </div>
-        </main>
+        </div>
+        
+        <div class="section">
+            <div class="summary-bar">
+                <h2>Master Bill List</h2>
+                <button class="control-btn" id="toggleMasterList">
+                    <span class="material-icons-round">visibility_off</span>
+                    <span class="btn-text">Hide List</span>
+                </button>
+            </div>
+            <div id="masterListContainer">
+                <ul id="masterList"></ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="summary-bar">
+                <h2>Upcoming Pay Cycles</h2>
+                <button class="control-btn" id="toggleAllCycles">
+                    <span class="material-icons-round">unfold_less</span>
+                    <span class="btn-text">Collapse All</span>
+                </button>
+            </div>
+            <div id="payCycles"></div>
+        </div>
     </div>
-
-    <script src="app.js"></script>
+    
+    <!-- Custom Frequency Modal -->
+    <div id="customFrequencyModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Custom Frequency</h2>
+            
+            <div class="frequency-option">
+                <label for="customFrequencyValue">Repeat every:</label>
+                <div class="frequency-inputs">
+                    <input type="number" id="customFrequencyValue" min="1" value="1">
+                    <select id="customFrequencyUnit">
+                        <option value="days">Day(s)</option>
+                        <option value="weeks">Week(s)</option>
+                        <option value="months">Month(s)</option>
+                        <option value="years">Year(s)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="frequency-option" id="weekdaySelector" style="display:none;">
+                <label>On:</label>
+                <div class="weekday-buttons">
+                    <button type="button" class="weekday-btn" data-day="0">Su</button>
+                    <button type="button" class="weekday-btn" data-day="1">Mo</button>
+                    <button type="button" class="weekday-btn" data-day="2">Tu</button>
+                    <button type="button" class="weekday-btn" data-day="3">We</button>
+                    <button type="button" class="weekday-btn" data-day="4">Th</button>
+                    <button type="button" class="weekday-btn" data-day="5">Fr</button>
+                    <button type="button" class="weekday-btn" data-day="6">Sa</button>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn-text" id="cancelCustomFrequency">Cancel</button>
+                <button class="btn-filled" id="saveCustomFrequency">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
 </body>
 </html>
