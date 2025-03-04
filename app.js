@@ -33,6 +33,7 @@
             this.importData = this.importData.bind(this);
             this.updateRemainingDays = this.updateRemainingDays.bind(this);
             this.handleEditPeriodFormSubmit = this.handleEditPeriodFormSubmit.bind(this);
+            this.handleAddTransaction = this.handleAddTransaction.bind(this); // Added binding
 
             // Event Listeners
             this.addPeriodBtn.addEventListener('click', this.createDefaultBillingPeriod);
@@ -189,7 +190,6 @@
             this.saveBillingPeriods();
             this.setDefaultDates();
         }
-
         renderBillingPeriod(period) {
             const totalOwing = this.calculateTotalOwing(period);
             const daysRemaining = this.calculateRemainingDays(period);
@@ -274,17 +274,17 @@
                 </table>
             `;
 
-            // Add event listeners for buttons
+            // Add event listeners for buttons - FIXED: using e.currentTarget
             periodElement.querySelector('.add-transaction-btn').addEventListener('click', (e) => {
-                this.currentPeriod = this.billingPeriods.find(p => p.id === e.target.dataset.periodId);
+                this.currentPeriod = this.billingPeriods.find(p => p.id === e.currentTarget.dataset.periodId);
                 this.openTransactionModal('expense');
             });
             periodElement.querySelector('.add-repayment-btn').addEventListener('click', (e) => {
-                this.currentPeriod = this.billingPeriods.find(p => p.id === e.target.dataset.periodId);
+                this.currentPeriod = this.billingPeriods.find(p => p.id === e.currentTarget.dataset.periodId);
                 this.openTransactionModal('repayment');
             });
             periodElement.querySelector('.edit-period-btn').addEventListener('click', (e) => {
-                this.openEditPeriodModal(e.target.dataset.periodId);
+                this.openEditPeriodModal(e.currentTarget.dataset.periodId);
             });
 
             this.billingPeriodsContainer.appendChild(periodElement);
@@ -302,30 +302,19 @@
         }
 
         renderTransactions(transactions, periodId) {
-            // Add original index to each transaction to preserve insertion order
-            const indexedTransactions = transactions.map((transaction, index) => ({
-                ...transaction,
-                originalIndex: index
-            }));
+            if (!transactions || transactions.length === 0) {
+                console.log(`No transactions to render for period ${periodId}`);
+                return '';
+            }
             
-            // Sort transactions by date (newest first) and then by original insertion order
-            const sortedTransactions = [...indexedTransactions].sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
-                
-                // If dates are different, sort by date (newest first)
-                if (dateB.getTime() !== dateA.getTime()) {
-                    return dateB - dateA;
-                }
-                
-                // If dates are the same, preserve original order
-                return a.originalIndex - b.originalIndex;
-            });
+            console.log(`Rendering ${transactions.length} transactions for period ${periodId}`);
             
-            return sortedTransactions.map((transaction) => {
+            return transactions.map((transaction, index) => {
                 // Format the transaction date
                 const transactionDateObj = new Date(transaction.date);
                 const formattedDate = this.formatDate(transactionDateObj);
+                
+                console.log(`Rendering transaction: ${index}, date: ${formattedDate}, amount: ${transaction.amount}`);
                 
                 return `
                 <tr>
@@ -333,7 +322,7 @@
                     <td>${transaction.description}</td>
                     <td data-type="${transaction.type}">${transaction.type === 'repayment' ? '-$' : '$'}${Math.abs(parseFloat(transaction.amount)).toFixed(2)}</td>
                     <td>
-                        <button class="delete-transaction-btn" data-period-id="${periodId}" data-transaction-index="${transaction.originalIndex}">
+                        <button class="delete-transaction-btn" data-period-id="${periodId}" data-transaction-index="${index}">
                             <span class="delete-icon">×</span>
                         </button>
                     </td>
@@ -409,8 +398,12 @@
 
         handleAddTransaction(e, type) {
             e.preventDefault();
+            console.log("handleAddTransaction called with type:", type);
 
-            if (!this.currentPeriod) return;
+            if (!this.currentPeriod) {
+                console.log("No current period selected");
+                return;
+            }
 
             const form = type === 'expense' ? this.transactionForm : this.paymentForm;
             const dateInput = form.querySelector(`#${type === 'expense' ? 'transaction' : 'payment'}-date`);
@@ -423,6 +416,8 @@
                 description: descInput.value || (type === 'expense' ? 'Transaction' : 'Payment'),
                 type: type // 'expense' or 'repayment'
             };
+            
+            console.log("Transaction data:", transaction);
 
             // Validate date
             const transactionDate = new Date(transaction.date);
@@ -436,6 +431,7 @@
 
             // Add transaction/repayment
             this.currentPeriod.transactions.push(transaction);
+            console.log("Added transaction to period:", this.currentPeriod.id);
 
             // Update UI
             this.updatePeriodDisplay(this.currentPeriod);
@@ -447,7 +443,13 @@
 
         updatePeriodDisplay(period) {
             const periodElement = document.querySelector(`[data-period-id="${period.id}"]`);
-            if (!periodElement) return;
+            if (!periodElement) {
+                console.log(`Period element not found for ID: ${period.id}`);
+                return;
+            }
+            
+            console.log(`Updating display for period: ${period.id}`);
+            console.log(`Current transactions:`, period.transactions);
             
             const transactionsBody = periodElement.querySelector('.transactions-body');
             const totalOwingElement = periodElement.querySelector('.detail-item:nth-child(3) .detail-value');
@@ -460,20 +462,30 @@
             const totalOwing = this.calculateTotalOwing(period);
             totalOwingElement.textContent = `$${totalOwing.toFixed(2)}`;
             
-            // Update days remaining and status
-            this.updateRemainingDays();
+            console.log(`Updated total owing: $${totalOwing.toFixed(2)}`);
         }
 
         addDeleteEventListeners(periodId) {
             const periodElement = document.querySelector(`[data-period-id="${periodId}"]`);
-            if (!periodElement) return;
+            if (!periodElement) {
+                console.log(`Period element not found for ID: ${periodId} when adding delete listeners`);
+                return;
+            }
             
             const deleteButtons = periodElement.querySelectorAll('.delete-transaction-btn');
+            console.log(`Found ${deleteButtons.length} delete buttons for period ${periodId}`);
             
-            deleteButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
+            deleteButtons.forEach((btn, index) => {
+                // First remove any existing listeners to avoid duplicates
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                // Now add the event listener to the fresh button
+                newBtn.addEventListener('click', (e) => {
+                    console.log("Delete button clicked");
                     const periodId = e.currentTarget.dataset.periodId;
                     const transactionIndex = parseInt(e.currentTarget.dataset.transactionIndex);
+                    console.log(`Deleting transaction at index ${transactionIndex} from period ${periodId}`);
                     this.deleteTransaction(periodId, transactionIndex);
                 });
             });

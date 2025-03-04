@@ -164,6 +164,9 @@ button {
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
 }
 
 button:hover {
@@ -244,6 +247,8 @@ button:active {
     align-items: center;
     gap: var(--spacing-1);
     font-size: 0.8rem;
+    z-index: 2;
+    pointer-events: auto;
 }
 
 .edit-period-btn:hover {
@@ -260,6 +265,7 @@ button:active {
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'%3E%3C/path%3E%3Cpath d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'%3E%3C/path%3E%3C/svg%3E");
     mask-size: cover;
     -webkit-mask-size: cover;
+    pointer-events: none;
 }
 
 /* Interest-free period info section */
@@ -313,6 +319,7 @@ button:active {
     gap: var(--spacing-3);
     margin-bottom: var(--spacing-5);
     flex-wrap: wrap;
+    pointer-events: auto;
 }
 
 /* Transactions Table */
@@ -323,6 +330,7 @@ button:active {
     border-radius: var(--radius-md);
     overflow: hidden;
     margin-top: var(--spacing-4);
+    pointer-events: auto;
 }
 
 .transactions-table th,
@@ -359,6 +367,9 @@ button:active {
     border-radius: var(--radius-full);
     font-weight: 500;
     padding: var(--spacing-3) var(--spacing-5);
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
 }
 
 .add-transaction-btn {
@@ -408,6 +419,9 @@ button:active {
     transition: background-color 0.2s;
     padding: 0;
     font-size: 0.9rem;
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
 }
 
 .delete-transaction-btn:hover {
@@ -417,6 +431,7 @@ button:active {
 .delete-icon {
     font-size: 1rem;
     line-height: 1;
+    pointer-events: none;
 }
 
 /* Modal */
@@ -582,4 +597,39 @@ button:active {
     .edit-period-btn {
         align-self: flex-start;
     }
+}
+
+/* Fix for all buttons to ensure they can receive clicks */
+button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Ensure child elements of buttons don't interfere with clicks */
+button > * {
+    pointer-events: none !important;
+}
+
+/* Specific fix for action buttons */
+.add-transaction-btn, 
+.add-repayment-btn, 
+.delete-transaction-btn {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* Ensure the transaction table allows clicks */
+.transactions-table {
+    pointer-events: auto !important;
+}
+
+/* Make sure delete buttons are clickable */
+.delete-transaction-btn .delete-icon {
+    pointer-events: none !important;
+}
+
+/* Ensure the button icons don't block clicks */
+.edit-icon {
+    pointer-events: none !important;
 }
