@@ -1,15 +1,3 @@
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(registration => {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      })
-      .catch(error => {
-        console.log('ServiceWorker registration failed: ', error);
-      });
-  });
-}
-
 (function() {
     class InterestFreeTracker {
         constructor() {
@@ -274,10 +262,10 @@ if ('serviceWorker' in navigator) {
                 <table class="transactions-table">
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Actions</th>
+                            <th>DATE</th>
+                            <th>DESCRIPTION</th>
+                            <th>AMOUNT</th>
+                            <th>ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody class="transactions-body">
@@ -321,7 +309,12 @@ if ('serviceWorker' in navigator) {
             
             console.log(`Rendering ${transactions.length} transactions for period ${periodId}`);
             
-            return transactions.map((transaction, index) => {
+            // Sort transactions by date (newest first)
+            const sortedTransactions = [...transactions].sort((a, b) => {
+                return new Date(b.date) - new Date(a.date);
+            });
+            
+            return sortedTransactions.map((transaction, index) => {
                 // Format the transaction date
                 const transactionDateObj = new Date(transaction.date);
                 const formattedDate = this.formatDate(transactionDateObj);
@@ -341,7 +334,6 @@ if ('serviceWorker' in navigator) {
                 </tr>
             `}).join('');
         }
-
         calculateRemainingDays(period) {
             // Parse dates using local date parts to ensure consistent timezone handling
             const [startYear, startMonth, startDay] = period.startDate.split('-').map(Number);
@@ -707,5 +699,50 @@ if ('serviceWorker' in navigator) {
     // Initialize the tracker when the page loads
     document.addEventListener('DOMContentLoaded', () => {
         window.interestFreeTracker = new InterestFreeTracker();
+        
+        // Add a script to sort transactions after page loads
+        setTimeout(() => {
+            // Sort all transaction tables by date (newest first)
+            const tables = document.querySelectorAll('.transactions-table');
+            tables.forEach(table => {
+                const tbody = table.querySelector('.transactions-body');
+                if (!tbody) return;
+                
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                if (rows.length <= 1) return;
+                
+                // Sort rows by date
+                rows.sort((a, b) => {
+                    // Helper function to parse dates in format "22nd Feb 2025"
+                    const parseCustomDate = (dateText) => {
+                        const parts = dateText.match(/(\d+)(?:st|nd|rd|th)\s+([A-Za-z]+)\s+(\d+)/);
+                        if (!parts) return new Date();
+                        
+                        const day = parseInt(parts[1], 10);
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        const month = monthNames.indexOf(parts[2]);
+                        const year = parseInt(parts[3], 10);
+                        
+                        return new Date(year, month, day);
+                    };
+                    
+                    // Get date from first cell in each row
+                    const dateA = parseCustomDate(a.cells[0].textContent.trim());
+                    const dateB = parseCustomDate(b.cells[0].textContent.trim());
+                    
+                    // Sort newest first
+                    return dateB - dateA;
+                });
+                
+                // Remove existing rows
+                while (tbody.firstChild) {
+                    tbody.removeChild(tbody.firstChild);
+                }
+                
+                // Add sorted rows
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        }, 1000);
     });
 })();
