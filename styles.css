@@ -633,3 +633,264 @@ button > * {
 .edit-icon {
     pointer-events: none !important;
 }
+
+/* PWA-specific styles */
+
+/* Install Prompt */
+.install-prompt {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-3);
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: none;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.prompt-content {
+    display: flex;
+    align-items: center;
+    max-width: 90%;
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-4);
+    box-shadow: var(--shadow-lg);
+}
+
+.prompt-icon {
+    font-size: 2rem;
+    margin-right: var(--spacing-4);
+}
+
+.prompt-message {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.prompt-close {
+    margin-left: var(--spacing-4);
+    padding: var(--spacing-2) var(--spacing-4);
+    background-color: var(--primary);
+    color: var(--on-primary);
+    border: none;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Notification */
+.app-notification {
+    position: fixed;
+    top: var(--spacing-5);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    max-width: 90%;
+    width: 400px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    animation: fadeDown 0.3s ease-out;
+}
+
+@keyframes fadeDown {
+    from { opacity: 0; transform: translate(-50%, -20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-3) var(--spacing-4);
+    font-size: 0.9rem;
+}
+
+.notification-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.notification-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+.close-notification {
+    background: none;
+    border: none;
+    color: currentColor;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: var(--spacing-3);
+}
+
+/* iOS-specific install prompt */
+.ios-install-prompt {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: var(--spacing-3);
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    animation: slideUp 0.3s ease-out;
+}
+
+.ios-prompt-content {
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-5);
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+}
+
+.ios-prompt-content h3 {
+    margin-top: 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.ios-instructions {
+    margin: var(--spacing-4) 0;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-3);
+}
+
+.step-number {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: var(--spacing-3);
+    flex-shrink: 0;
+}
+
+.step-text {
+    flex: 1;
+}
+
+.ios-prompt-close {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    border: none;
+    border-radius: var(--radius-full);
+    padding: var(--spacing-2) var(--spacing-5);
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    margin-top: var(--spacing-3);
+}
+
+/* Additional styles for the container */
+.container {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #121212;
+        --surface: #1e1e1e;
+        --surface-light: #2a2a2a;
+        --on-background: #e7e7e7;
+        --on-surface: #e7e7e7;
+        --text-primary: #e7e7e7;
+        --text-secondary: #b0b0b0;
+        --text-hint: #7a7a7a;
+    }
+    
+    /* Adjust shadows for dark mode */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 12px 16px -4px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+    
+    /* Adjust form inputs for dark mode */
+    .form-row input,
+    .form-group input {
+        border-color: #3a3a3a;
+        background-color: #2c2c2c;
+        color: var(--text-primary);
+    }
+    
+    /* Adjust secondary button colors for dark mode */
+    button {
+        background-color: #2c2c2c;
+    }
+    
+    button:hover {
+        background-color: #3a3a3a;
+    }
+    
+    /* Table adjustments for dark mode */
+    .transactions-table tbody tr {
+        background-color: var(--surface);
+    }
+    
+    .transactions-table tbody tr:hover {
+        background-color: #2c2c2c;
+    }
+    
+    .transactions-table th,
+    .transactions-table td {
+        border-bottom-color: #3a3a3a;
+    }
+}
+
+/* Safari-specific fixes */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari specific styles */
+    body {
+        /* Prevent overscroll bounce effect */
+        position: fixed;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Fix for date inputs on iOS */
+    input[type="date"] {
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    
+    /* Fix for modal backdrops on iOS */
+    .modal {
+        -webkit-backdrop-filter: blur(4px);
+    }
+    
+    /* Fix for install prompts on iOS */
+    .install-prompt, .ios-install-prompt {
+        -webkit-backdrop-filter: blur(5px);
+    }
+}
