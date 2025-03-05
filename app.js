@@ -73,11 +73,6 @@
                     this.updateRemainingDays();
                 }
             });
-            
-            // Log debug information
-            console.log('InterestFreeTracker initialized');
-            console.log('Current date:', new Date().toLocaleString());
-            console.log('Billing periods:', this.billingPeriods);
         }
         
         migrateBillingPeriods() {
@@ -97,7 +92,6 @@
             });
             
             if (migrated) {
-                console.log('Migrated billing periods to include interest-free end dates');
                 this.saveBillingPeriods();
             }
         }
@@ -118,7 +112,6 @@
             });
             
             if (migrated) {
-                console.log('Migrated transactions to include unique IDs');
                 this.saveBillingPeriods();
             }
         }
@@ -140,12 +133,6 @@
             
             // Ensure we're working with the latest data
             this.billingPeriods = this.loadBillingPeriods();
-            
-            // Force recalculation of all remaining days
-            this.billingPeriods.forEach(period => {
-                const daysRemaining = this.calculateRemainingDays(period);
-                console.log(`Period ${period.startDate}: ${daysRemaining} days remaining`);
-            });
             
             // Sort periods by start date (newest first)
             const sortedPeriods = [...this.billingPeriods].sort((a, b) => {
@@ -205,15 +192,13 @@
                 transactions: []
             };
             
-            console.log(`Creating period: ${startDate} to ${endDate}`);
-            console.log(`Interest-free period: ${interestFreeDays} days (until ${period.interestFreeEndDate})`);
-            
             this.billingPeriods.push(period);
             this.renderBillingPeriod(period);
             this.currentPeriod = period;
             this.saveBillingPeriods();
             this.setDefaultDates();
         }
+        
         renderBillingPeriod(period) {
             const totalOwing = this.calculateTotalOwing(period);
             const daysRemaining = this.calculateRemainingDays(period);
@@ -315,23 +300,12 @@
             
             // Add delete transaction event listeners
             this.addDeleteEventListeners(period.id);
-            
-            // Log debug information
-            console.log(`Rendered period: ${period.id}`);
-            console.log(`- Start date: ${formattedStartDate}`);
-            console.log(`- End date: ${formattedEndDate}`);
-            console.log(`- Interest-free days: ${period.interestFreePeriodDays}`);
-            console.log(`- Interest-free until: ${formattedInterestFreeEndDate}`);
-            console.log(`- Days remaining: ${daysRemaining}`);
         }
 
         renderTransactions(transactions, periodId) {
             if (!transactions || transactions.length === 0) {
-                console.log(`No transactions to render for period ${periodId}`);
                 return '';
             }
-            
-            console.log(`Rendering ${transactions.length} transactions for period ${periodId}`);
             
             // Sort transactions by date (newest first)
             const sortedTransactions = [...transactions].sort((a, b) => {
@@ -342,8 +316,6 @@
                 // Format the transaction date
                 const transactionDateObj = new Date(transaction.date);
                 const formattedDate = this.formatDate(transactionDateObj);
-                
-                console.log(`Rendering transaction: ${transaction.id || 'no-id'}, date: ${formattedDate}, amount: ${transaction.amount}`);
                 
                 // Ensure transaction has an ID (for compatibility with old data)
                 const transactionId = transaction.id || `transaction-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -382,22 +354,11 @@
             // Calculate the interest-free days remaining
             const daysRemaining = period.interestFreePeriodDays - daysDiff;
             
-            console.log('--------- Date calculations ---------');
-            console.log(`Start date: ${startDate.toDateString()}`);
-            console.log(`Today: ${today.toDateString()}`);
-            console.log(`Days elapsed: ${daysDiff}`);
-            console.log(`Interest-free period: ${period.interestFreePeriodDays} days`);
-            console.log(`Days remaining: ${daysRemaining}`);
-            console.log('------------------------------------');
-            
             return Math.max(0, daysRemaining);
         }
         
         updateRemainingDays() {
-            const now = new Date();
-            console.log(`Updating days remaining at: ${now.toLocaleString()}`);
-            
-            // Force a full re-render instead of trying to update existing elements
+            // Force a full re-render to update the days
             this.renderExistingBillingPeriods();
         }
 
@@ -430,10 +391,8 @@
 
         handleAddTransaction(e, type) {
             e.preventDefault();
-            console.log("handleAddTransaction called with type:", type);
 
             if (!this.currentPeriod) {
-                console.log("No current period selected");
                 return;
             }
 
@@ -443,14 +402,12 @@
             const descInput = form.querySelector(`#${type === 'expense' ? 'transaction' : 'payment'}-description`);
 
             const transaction = {
-                id: `transaction-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Add a unique ID
+                id: `transaction-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 date: dateInput.value,
                 amount: amountInput.value,
                 description: descInput.value || (type === 'expense' ? 'Transaction' : 'Payment'),
                 type: type // 'expense' or 'repayment'
             };
-            
-            console.log("Transaction data:", transaction);
 
             // Validate date
             const transactionDate = new Date(transaction.date);
@@ -465,7 +422,6 @@
             // Find the period in the array by ID to ensure we're updating the correct one
             const periodIndex = this.billingPeriods.findIndex(p => p.id === this.currentPeriod.id);
             if (periodIndex === -1) {
-                console.error("Could not find period in billingPeriods array");
                 return;
             }
             
@@ -474,9 +430,6 @@
             
             // Update our current period reference
             this.currentPeriod = this.billingPeriods[periodIndex];
-            
-            console.log("Added transaction to period:", this.currentPeriod.id);
-            console.log("Updated transactions:", this.currentPeriod.transactions);
 
             // Save before updating UI
             this.saveBillingPeriods();
@@ -491,12 +444,8 @@
         updatePeriodDisplay(period) {
             const periodElement = document.querySelector(`[data-period-id="${period.id}"]`);
             if (!periodElement) {
-                console.log(`Period element not found for ID: ${period.id}`);
                 return;
             }
-            
-            console.log(`Updating display for period: ${period.id}`);
-            console.log(`Current transactions:`, period.transactions);
             
             const transactionsBody = periodElement.querySelector('.transactions-body');
             const totalOwingElement = periodElement.querySelector('.detail-item:nth-child(3) .detail-value');
@@ -508,19 +457,15 @@
             
             const totalOwing = this.calculateTotalOwing(period);
             totalOwingElement.textContent = `$${totalOwing.toFixed(2)}`;
-            
-            console.log(`Updated total owing: $${totalOwing.toFixed(2)}`);
         }
 
         addDeleteEventListeners(periodId) {
             const periodElement = document.querySelector(`[data-period-id="${periodId}"]`);
             if (!periodElement) {
-                console.log(`Period element not found for ID: ${periodId} when adding delete listeners`);
                 return;
             }
             
             const deleteButtons = periodElement.querySelectorAll('.delete-transaction-btn');
-            console.log(`Found ${deleteButtons.length} delete buttons for period ${periodId}`);
             
             deleteButtons.forEach((btn) => {
                 // First remove any existing listeners to avoid duplicates
@@ -529,10 +474,8 @@
                 
                 // Now add the event listener to the fresh button
                 newBtn.addEventListener('click', (e) => {
-                    console.log("Delete button clicked");
                     const periodId = e.currentTarget.dataset.periodId;
                     const transactionId = e.currentTarget.dataset.transactionId;
-                    console.log(`Deleting transaction with ID ${transactionId} from period ${periodId}`);
                     this.deleteTransaction(periodId, transactionId);
                 });
             });
@@ -548,8 +491,6 @@
                     period.transactions.splice(transactionIndex, 1);
                     this.saveBillingPeriods();
                     this.updatePeriodDisplay(period);
-                } else {
-                    console.error(`Transaction with ID ${transactionId} not found in period ${periodId}`);
                 }
             }
         }
@@ -606,12 +547,6 @@
             
             // Close the modal
             this.editPeriodModal.style.display = 'none';
-            
-            console.log(`Updated period: ${this.currentPeriod.id}`);
-            console.log(`- New start date: ${startDate} (${this.formatDate(new Date(startDate))})`);
-            console.log(`- New end date: ${endDate} (${this.formatDate(new Date(endDate))})`);
-            console.log(`- New interest-free days: ${interestFreeDays}`);
-            console.log(`- New interest-free end date: ${this.currentPeriod.interestFreeEndDate} (${this.formatDate(interestFreeEndDate)})`);
         }
 
         exportData() {
