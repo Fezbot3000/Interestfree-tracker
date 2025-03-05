@@ -33,7 +33,7 @@
             this.importData = this.importData.bind(this);
             this.updateRemainingDays = this.updateRemainingDays.bind(this);
             this.handleEditPeriodFormSubmit = this.handleEditPeriodFormSubmit.bind(this);
-            this.handleAddTransaction = this.handleAddTransaction.bind(this); // Added binding
+            this.handleAddTransaction = this.handleAddTransaction.bind(this);
 
             // Event Listeners
             this.addPeriodBtn.addEventListener('click', this.createDefaultBillingPeriod);
@@ -54,6 +54,9 @@
 
             // Before rendering, migrate any existing billing periods to include interest-free end date
             this.migrateBillingPeriods();
+
+            // Migrate transactions to include unique IDs
+            this.migrateTransactionsWithIds();
 
             // Render existing billing periods
             this.renderExistingBillingPeriods();
@@ -95,6 +98,27 @@
             
             if (migrated) {
                 console.log('Migrated billing periods to include interest-free end dates');
+                this.saveBillingPeriods();
+            }
+        }
+
+        migrateTransactionsWithIds() {
+            let migrated = false;
+            
+            this.billingPeriods.forEach(period => {
+                if (period.transactions && period.transactions.length > 0) {
+                    period.transactions.forEach((transaction, index) => {
+                        if (!transaction.id) {
+                            // Generate a unique ID for the transaction
+                            transaction.id = `transaction-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`;
+                            migrated = true;
+                        }
+                    });
+                }
+            });
+            
+            if (migrated) {
+                console.log('Migrated transactions to include unique IDs');
                 this.saveBillingPeriods();
             }
         }
@@ -274,7 +298,7 @@
                 </table>
             `;
 
-            // Add event listeners for buttons - FIXED: using e.currentTarget
+            // Add event listeners for buttons
             periodElement.querySelector('.add-transaction-btn').addEventListener('click', (e) => {
                 this.currentPeriod = this.billingPeriods.find(p => p.id === e.currentTarget.dataset.periodId);
                 this.openTransactionModal('expense');
@@ -314,12 +338,15 @@
                 return new Date(b.date) - new Date(a.date);
             });
             
-            return sortedTransactions.map((transaction, index) => {
+            return sortedTransactions.map((transaction) => {
                 // Format the transaction date
                 const transactionDateObj = new Date(transaction.date);
                 const formattedDate = this.formatDate(transactionDateObj);
                 
-                console.log(`Rendering transaction: ${index}, date: ${formattedDate}, amount: ${transaction.amount}`);
+                console.log(`Rendering transaction: ${transaction.id || 'no-id'}, date: ${formattedDate}, amount: ${transaction.amount}`);
+                
+                // Ensure transaction has an ID (for compatibility with old data)
+                const transactionId = transaction.id || `transaction-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
                 
                 return `
                 <tr>
@@ -327,13 +354,14 @@
                     <td>${transaction.description}</td>
                     <td data-type="${transaction.type}">${transaction.type === 'repayment' ? '-$' : '$'}${Math.abs(parseFloat(transaction.amount)).toFixed(2)}</td>
                     <td>
-                        <button class="delete-transaction-btn" data-period-id="${periodId}" data-transaction-index="${index}">
+                        <button class="delete-transaction-btn" data-period-id="${periodId}" data-transaction-id="${transactionId}">
                             <span class="delete-icon">×</span>
                         </button>
                     </td>
                 </tr>
             `}).join('');
         }
+
         calculateRemainingDays(period) {
             // Parse dates using local date parts to ensure consistent timezone handling
             const [startYear, startMonth, startDay] = period.startDate.split('-').map(Number);
@@ -415,6 +443,7 @@
             const descInput = form.querySelector(`#${type === 'expense' ? 'transaction' : 'payment'}-description`);
 
             const transaction = {
+                id: `transaction-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Add a unique ID
                 date: dateInput.value,
                 amount: amountInput.value,
                 description: descInput.value || (type === 'expense' ? 'Transaction' : 'Payment'),
@@ -472,8 +501,6 @@
             const transactionsBody = periodElement.querySelector('.transactions-body');
             const totalOwingElement = periodElement.querySelector('.detail-item:nth-child(3) .detail-value');
             
-            // This line is causing the issue - it's replacing all transactions
-            // instead of just adding the new one
             transactionsBody.innerHTML = this.renderTransactions(period.transactions, period.id);
             
             // Add event listeners to the delete buttons
@@ -495,7 +522,7 @@
             const deleteButtons = periodElement.querySelectorAll('.delete-transaction-btn');
             console.log(`Found ${deleteButtons.length} delete buttons for period ${periodId}`);
             
-            deleteButtons.forEach((btn, index) => {
+            deleteButtons.forEach((btn) => {
                 // First remove any existing listeners to avoid duplicates
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
@@ -504,21 +531,26 @@
                 newBtn.addEventListener('click', (e) => {
                     console.log("Delete button clicked");
                     const periodId = e.currentTarget.dataset.periodId;
-                    const transactionIndex = parseInt(e.currentTarget.dataset.transactionIndex);
-                    console.log(`Deleting transaction at index ${transactionIndex} from period ${periodId}`);
-                    this.deleteTransaction(periodId, transactionIndex);
+                    const transactionId = e.currentTarget.dataset.transactionId;
+                    console.log(`Deleting transaction with ID ${transactionId} from period ${periodId}`);
+                    this.deleteTransaction(periodId, transactionId);
                 });
             });
         }
 
-        deleteTransaction(periodId, transactionIndex) {
+        deleteTransaction(periodId, transactionId) {
             const period = this.billingPeriods.find(p => p.id === periodId);
             if (!period) return;
 
             if (confirm('Are you sure you want to delete this transaction?')) {
-                period.transactions.splice(transactionIndex, 1);
-                this.updatePeriodDisplay(period);
-                this.saveBillingPeriods();
+                const transactionIndex = period.transactions.findIndex(t => t.id === transactionId);
+                if (transactionIndex !== -1) {
+                    period.transactions.splice(transactionIndex, 1);
+                    this.saveBillingPeriods();
+                    this.updatePeriodDisplay(period);
+                } else {
+                    console.error(`Transaction with ID ${transactionId} not found in period ${periodId}`);
+                }
             }
         }
 
@@ -611,6 +643,10 @@
                     
                     if (confirm('This will replace all your current data. Are you sure you want to continue?')) {
                         this.billingPeriods = importedData;
+                        
+                        // Ensure all transactions have IDs
+                        this.migrateTransactionsWithIds();
+                        
                         this.saveBillingPeriods();
                         this.renderExistingBillingPeriods();
                         alert('Data imported successfully!');
@@ -699,50 +735,5 @@
     // Initialize the tracker when the page loads
     document.addEventListener('DOMContentLoaded', () => {
         window.interestFreeTracker = new InterestFreeTracker();
-        
-        // Add a script to sort transactions after page loads
-        setTimeout(() => {
-            // Sort all transaction tables by date (newest first)
-            const tables = document.querySelectorAll('.transactions-table');
-            tables.forEach(table => {
-                const tbody = table.querySelector('.transactions-body');
-                if (!tbody) return;
-                
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                if (rows.length <= 1) return;
-                
-                // Sort rows by date
-                rows.sort((a, b) => {
-                    // Helper function to parse dates in format "22nd Feb 2025"
-                    const parseCustomDate = (dateText) => {
-                        const parts = dateText.match(/(\d+)(?:st|nd|rd|th)\s+([A-Za-z]+)\s+(\d+)/);
-                        if (!parts) return new Date();
-                        
-                        const day = parseInt(parts[1], 10);
-                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        const month = monthNames.indexOf(parts[2]);
-                        const year = parseInt(parts[3], 10);
-                        
-                        return new Date(year, month, day);
-                    };
-                    
-                    // Get date from first cell in each row
-                    const dateA = parseCustomDate(a.cells[0].textContent.trim());
-                    const dateB = parseCustomDate(b.cells[0].textContent.trim());
-                    
-                    // Sort newest first
-                    return dateB - dateA;
-                });
-                
-                // Remove existing rows
-                while (tbody.firstChild) {
-                    tbody.removeChild(tbody.firstChild);
-                }
-                
-                // Add sorted rows
-                rows.forEach(row => tbody.appendChild(row));
-            });
-        }, 1000);
     });
 })();
