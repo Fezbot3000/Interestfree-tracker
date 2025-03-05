@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Interest-Free Bill Tracker</title>
+    
     <!-- Favicon -->
-    <link rel="icon" href="icons/icon-72x72.png">
+    <link rel="icon" href="./icons/icon-72x72.png">
+    
     <!-- Link to external CSS file -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./styles.css">
     
     <!-- Web App Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     
     <!-- iOS Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,23 +20,59 @@
     <meta name="apple-mobile-web-app-title" content="Bill Tracker">
     
     <!-- iOS icons -->
-    <link rel="apple-touch-icon" href="icons/icon-72x72.png" sizes="72x72">
-    <link rel="apple-touch-icon" href="icons/icon-96x96.png" sizes="96x96">
-    <link rel="apple-touch-icon" href="icons/icon-128x128.png" sizes="128x128">
-    <link rel="apple-touch-icon" href="icons/icon-144x144.png" sizes="144x144">
-    <link rel="apple-touch-icon" href="icons/icon-152x152.png" sizes="152x152">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="icons/icon-384x384.png" sizes="384x384">
-    <link rel="apple-touch-icon" href="icons/icon-512x512.png" sizes="512x512">
+    <link rel="apple-touch-icon" href="./icons/icon-72x72.png" sizes="72x72">
+    <link rel="apple-touch-icon" href="./icons/icon-96x96.png" sizes="96x96">
+    <link rel="apple-touch-icon" href="./icons/icon-128x128.png" sizes="128x128">
+    <link rel="apple-touch-icon" href="./icons/icon-144x144.png" sizes="144x144">
+    <link rel="apple-touch-icon" href="./icons/icon-152x152.png" sizes="152x152">
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="./icons/icon-384x384.png" sizes="384x384">
+    <link rel="apple-touch-icon" href="./icons/icon-512x512.png" sizes="512x512">
     
     <!-- iOS splash screens -->
-    <link rel="apple-touch-startup-image" href="icons/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="icons/splash-1242x2208.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)">
-    <link rel="apple-touch-startup-image" href="icons/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="./icons/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="./icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+    <link rel="apple-touch-startup-image" href="./icons/splash-1242x2208.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" href="./icons/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
     
     <!-- Meta theme color -->
     <meta name="theme-color" content="#7b61ff">
+    
+    <!-- GitHub Pages SPA Redirect Script -->
+    <script>
+      // This script checks to see if a redirect is present in the query string
+      // and converts it back into the correct URL that should be in the browser's
+      // history stack. It's used specifically for GitHub Pages hosting.
+      (function() {
+        // Only process if on GitHub Pages
+        if (location.hostname.indexOf('github.io') > -1) {
+          var redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          
+          // If there was a redirect, update the URL
+          if (redirect && redirect !== location.href) {
+            history.replaceState(null, null, redirect);
+          }
+          
+          // Check for redirect in URL pattern /?/path
+          var l = location;
+          if (l.search) {
+            var q = {};
+            l.search.slice(1).split('&').forEach(function(v) {
+              var a = v.split('=');
+              q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
+            });
+            if (q['/']) {
+              history.replaceState(null, null,
+                l.pathname.slice(0, -1) + (q['/'] || '') +
+                l.search.slice(1).replace(/\?&/, '?').replace(/\?\//, '/').replace(/\/\?/, '/').replace(/\?/, '&') +
+                l.hash
+              );
+            }
+          }
+        }
+      })();
+    </script>
 </head>
 <body>
     <header>
@@ -152,14 +190,18 @@
     </div>
 
     <!-- Link to JavaScript files -->
-    <script src="app.js"></script>
-    <script src="offline.js"></script>
+    <script src="./app.js"></script>
+    <script src="./offline.js"></script>
     
     <!-- Service Worker Registration -->
     <script>
       // Register service worker for offline support
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          // Get the base path of the site
+          const basePath = location.pathname.replace(/\/[^/]*$/, '/');
+          
+          // Register the service worker with the correct path
           navigator.serviceWorker.register('./service-worker.js')
             .then(registration => {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
