@@ -110,35 +110,26 @@
             return savedPeriods ? JSON.parse(savedPeriods) : [];
         }
 
+        // Render existing billing periods when page loads
         renderExistingBillingPeriods() {
-    this.billingPeriodsContainer.innerHTML = '';
-    
-    // Ensure we're working with the latest data
-    this.billingPeriods = this.loadBillingPeriods();
-    
-    // Force recalculation of all remaining days
-    this.billingPeriods.forEach(period => {
-        const daysRemaining = this.calculateRemainingDays(period);
-        console.log(`Period ${period.startDate}: ${daysRemaining} days remaining`);
-    });
-    
-    // Sort periods by start date (newest first)
-    const sortedPeriods = [...this.billingPeriods].sort((a, b) => {
-        // Convert strings to Date objects for comparison
-        const dateA = new Date(a.startDate);
-        const dateB = new Date(b.startDate);
-        
-        // Sort in descending order (most recent first)
-        return dateB - dateA;
-    });
-    
-    // Log the sorted periods for debugging
-    console.log("Periods sorted by date (newest first):", 
-        sortedPeriods.map(p => `${p.startDate} (${this.formatDate(new Date(p.startDate))})`));
-    
-    // Render each period in order
-    sortedPeriods.forEach(period => this.renderBillingPeriod(period));
-}
+            this.billingPeriodsContainer.innerHTML = '';
+            
+            // Ensure we're working with the latest data
+            this.billingPeriods = this.loadBillingPeriods();
+            
+            // Force recalculation of all remaining days
+            this.billingPeriods.forEach(period => {
+                const daysRemaining = this.calculateRemainingDays(period);
+                console.log(`Period ${period.startDate}: ${daysRemaining} days remaining`);
+            });
+            
+            // Sort periods by start date (newest first)
+            const sortedPeriods = [...this.billingPeriods].sort((a, b) => {
+                return new Date(b.startDate) - new Date(a.startDate);
+            });
+            
+            sortedPeriods.forEach(period => this.renderBillingPeriod(period));
+        }
 
         setDefaultDates() {
             const startDate = new Date();
@@ -438,15 +429,29 @@
                 return;
             }
 
-            // Add transaction/repayment
-            this.currentPeriod.transactions.push(transaction);
+            // Find the period in the array by ID to ensure we're updating the correct one
+            const periodIndex = this.billingPeriods.findIndex(p => p.id === this.currentPeriod.id);
+            if (periodIndex === -1) {
+                console.error("Could not find period in billingPeriods array");
+                return;
+            }
+            
+            // Add transaction to the period in the array
+            this.billingPeriods[periodIndex].transactions.push(transaction);
+            
+            // Update our current period reference
+            this.currentPeriod = this.billingPeriods[periodIndex];
+            
             console.log("Added transaction to period:", this.currentPeriod.id);
+            console.log("Updated transactions:", this.currentPeriod.transactions);
 
+            // Save before updating UI
+            this.saveBillingPeriods();
+            
             // Update UI
             this.updatePeriodDisplay(this.currentPeriod);
 
-            // Save and close
-            this.saveBillingPeriods();
+            // Close modal
             this.closeModals();
         }
 
@@ -463,6 +468,8 @@
             const transactionsBody = periodElement.querySelector('.transactions-body');
             const totalOwingElement = periodElement.querySelector('.detail-item:nth-child(3) .detail-value');
             
+            // This line is causing the issue - it's replacing all transactions
+            // instead of just adding the new one
             transactionsBody.innerHTML = this.renderTransactions(period.transactions, period.id);
             
             // Add event listeners to the delete buttons
