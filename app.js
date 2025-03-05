@@ -49,6 +49,9 @@
                 this.editPeriodModal.style.display = 'none';
             });
 
+            // Fix viewport for mobile
+            this.setupMobileViewport();
+            
             // Set default dates for custom period creation
             this.setDefaultDates();
 
@@ -73,6 +76,83 @@
                     this.updateRemainingDays();
                 }
             });
+        }
+        
+        setupMobileViewport() {
+            // Check if a viewport meta tag already exists
+            let viewport = document.querySelector('meta[name="viewport"]');
+            
+            // If it doesn't exist, create it
+            if (!viewport) {
+                viewport = document.createElement('meta');
+                viewport.name = 'viewport';
+                document.head.appendChild(viewport);
+            }
+            
+            // Set the viewport content to ensure proper mobile scaling and scrolling
+            viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes';
+            
+            // Add touch-action styles to ensure scrolling works properly on mobile
+            const style = document.createElement('style');
+            style.textContent = `
+                body, html {
+                    height: 100%;
+                    width: 100%;
+                    overflow-x: hidden;
+                    -webkit-overflow-scrolling: touch;
+                    touch-action: pan-y;
+                }
+                .transactions-table {
+                    max-width: 100%;
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+                @media (max-width: 767px) {
+                    .billing-period {
+                        overflow-x: auto;
+                        -webkit-overflow-scrolling: touch;
+                    }
+                    .period-details {
+                        display: flex;
+                        flex-wrap: wrap;
+                        justify-content: space-between;
+                    }
+                    .detail-item {
+                        flex: 0 0 calc(50% - 10px);
+                        margin-bottom: 10px;
+                    }
+                    .transactions-table {
+                        display: block;
+                        width: 100%;
+                    }
+                    .transactions-table th, 
+                    .transactions-table td {
+                        padding: 8px 4px;
+                        font-size: 14px;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Prevent double-tap zoom on mobile devices
+            document.addEventListener('touchend', function(event) {
+                // Don't prevent default for form elements that need focus
+                if (event.target.tagName === 'INPUT' || 
+                    event.target.tagName === 'SELECT' || 
+                    event.target.tagName === 'TEXTAREA' || 
+                    event.target.tagName === 'BUTTON') {
+                    return;
+                }
+                
+                // For everything else, prevent the default if it's a double-tap
+                const now = Date.now();
+                const lastTouch = this.lastTouchEnd || 0;
+                this.lastTouchEnd = now;
+                
+                if (now - lastTouch < 300) {
+                    event.preventDefault();
+                }
+            }, false);
         }
         
         migrateBillingPeriods() {
@@ -268,19 +348,21 @@
                     <button class="add-transaction-btn" data-period-id="${period.id}">Add Transaction</button>
                     <button class="add-repayment-btn" data-period-id="${period.id}">Add Repayment</button>
                 </div>
-                <table class="transactions-table">
-                    <thead>
-                        <tr>
-                            <th>DATE</th>
-                            <th>DESCRIPTION</th>
-                            <th>AMOUNT</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody class="transactions-body">
-                        ${this.renderTransactions(period.transactions, period.id)}
-                    </tbody>
-                </table>
+                <div class="responsive-table-container">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>DESCRIPTION</th>
+                                <th>AMOUNT</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody class="transactions-body">
+                            ${this.renderTransactions(period.transactions, period.id)}
+                        </tbody>
+                    </table>
+                </div>
             `;
 
             // Add event listeners for buttons
@@ -378,6 +460,11 @@
                 this.paymentModal.style.display = 'block';
                 document.getElementById('payment-date').value = this.getInputDateFormat(new Date());
             }
+            
+            // Ensure the modal is scrollable on mobile
+            document.body.style.overflow = 'hidden';
+            document.querySelector(type === 'expense' ? '#transaction-modal' : '#payment-modal').style.overflowY = 'auto';
+            document.querySelector(type === 'expense' ? '#transaction-modal' : '#payment-modal').style.webkitOverflowScrolling = 'touch';
         }
 
         closeModals() {
@@ -387,6 +474,9 @@
             this.transactionForm.reset();
             this.paymentForm.reset();
             this.editPeriodForm.reset();
+            
+            // Restore body scrolling
+            document.body.style.overflow = '';
         }
 
         handleAddTransaction(e, type) {
@@ -472,7 +562,11 @@
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
                 
-                // Now add the event listener to the fresh button
+                // Now add the event listener to the fresh button with increased touch target size
+                newBtn.style.padding = '8px';
+                newBtn.style.minWidth = '30px';
+                newBtn.style.minHeight = '30px';
+                
                 newBtn.addEventListener('click', (e) => {
                     const periodId = e.currentTarget.dataset.periodId;
                     const transactionId = e.currentTarget.dataset.transactionId;
@@ -508,6 +602,11 @@
             
             // Display the modal
             this.editPeriodModal.style.display = 'block';
+            
+            // Ensure the modal is scrollable on mobile
+            document.body.style.overflow = 'hidden';
+            document.querySelector('#edit-period-modal').style.overflowY = 'auto';
+            document.querySelector('#edit-period-modal').style.webkitOverflowScrolling = 'touch';
         }
 
         // Method to handle form submission for editing a period
@@ -547,6 +646,9 @@
             
             // Close the modal
             this.editPeriodModal.style.display = 'none';
+            
+            // Restore body scrolling
+            document.body.style.overflow = '';
         }
 
         exportData() {
@@ -670,5 +772,45 @@
     // Initialize the tracker when the page loads
     document.addEventListener('DOMContentLoaded', () => {
         window.interestFreeTracker = new InterestFreeTracker();
+        
+        // Add additional event listener for mobile viewport resizing
+        window.addEventListener('resize', () => {
+            // Force relayout to help with scrolling issues
+            document.body.style.display = 'none';
+            setTimeout(() => {
+                document.body.style.display = '';
+            }, 5);
+        });
+        
+        // Add extra CSS for mobile-friendly modals
+        const modalStyle = document.createElement('style');
+        modalStyle.textContent = `
+            @media (max-width: 767px) {
+                .modal {
+                    padding: 10px;
+                    overflow-y: auto;
+                    -webkit-overflow-scrolling: touch;
+                    max-height: 90vh;
+                }
+                .modal-content {
+                    width: 95%;
+                    margin: 5% auto;
+                    padding: 15px;
+                }
+                input, select, button {
+                    font-size: 16px !important; /* Prevents iOS zoom on focus */
+                    min-height: 44px;
+                    margin-bottom: 10px;
+                }
+                .form-group {
+                    margin-bottom: 15px;
+                }
+                .close-modal {
+                    font-size: 24px;
+                    padding: 8px;
+                }
+            }
+        `;
+        document.head.appendChild(modalStyle);
     });
 })();
