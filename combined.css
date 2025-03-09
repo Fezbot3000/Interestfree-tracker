@@ -135,6 +135,7 @@ body {
     height: 100%;
     padding: var(--spacing-5);
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
 }
 
 /* ==============================================
@@ -741,7 +742,8 @@ body {
 }
 
 #masterListContainer {
-    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
     transition: max-height 0.3s ease, padding 0.3s ease;
     background-color: var(--surface-light);
     border-radius: var(--radius-md);
@@ -857,7 +859,8 @@ body {
 }
 
 .cycle-content {
-    overflow: hidden;
+    max-height: 500px;
+    overflow-y: auto;
     transition: max-height 0.3s ease;
     padding: var(--spacing-4);
     background-color: var(--surface-light);
