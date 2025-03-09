@@ -2,14 +2,20 @@
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Interest-Free Bill Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Finance Tracker</title>
     
     <!-- Favicon -->
     <link rel="icon" href="./icons/icon-72x72.png">
     
-    <!-- Link to external CSS file -->
-    <link rel="stylesheet" href="./styles.css">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    
+    <!-- CSS styles will be loaded from combined.css -->
+    <link rel="stylesheet" href="./combined.css">
     
     <!-- Web App Manifest -->
     <link rel="manifest" href="./manifest.json">
@@ -17,7 +23,7 @@
     <!-- iOS Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Bill Tracker">
+    <meta name="apple-mobile-web-app-title" content="Finance Tracker">
     
     <!-- iOS icons -->
     <link rel="apple-touch-icon" href="./icons/icon-72x72.png" sizes="72x72">
@@ -28,180 +34,320 @@
     <link rel="apple-touch-icon" href="./icons/icon-192x192.png" sizes="192x192">
     <link rel="apple-touch-icon" href="./icons/icon-384x384.png" sizes="384x384">
     <link rel="apple-touch-icon" href="./icons/icon-512x512.png" sizes="512x512">
-    
-    <!-- iOS splash screens -->
-    <link rel="apple-touch-startup-image" href="./icons/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="./icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="./icons/splash-1242x2208.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)">
-    <link rel="apple-touch-startup-image" href="./icons/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
-    
-    <!-- Meta theme color -->
-    <meta name="theme-color" content="#7b61ff">
-    
-    <!-- GitHub Pages SPA Redirect Script -->
-    <script>
-      // This script checks to see if a redirect is present in the query string
-      // and converts it back into the correct URL that should be in the browser's
-      // history stack. It's used specifically for GitHub Pages hosting.
-      (function() {
-        // Only process if on GitHub Pages
-        if (location.hostname.indexOf('github.io') > -1) {
-          var redirect = sessionStorage.redirect;
-          delete sessionStorage.redirect;
-          
-          // If there was a redirect, update the URL
-          if (redirect && redirect !== location.href) {
-            history.replaceState(null, null, redirect);
-          }
-          
-          // Check for redirect in URL pattern /?/path
-          var l = location;
-          if (l.search) {
-            var q = {};
-            l.search.slice(1).split('&').forEach(function(v) {
-              var a = v.split('=');
-              q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
-            });
-            if (q['/']) {
-              history.replaceState(null, null,
-                l.pathname.slice(0, -1) + (q['/'] || '') +
-                l.search.slice(1).replace(/\?&/, '?').replace(/\?\//, '/').replace(/\/\?/, '/').replace(/\?/, '&') +
-                l.hash
-              );
-            }
-          }
-        }
-      })();
-    </script>
 </head>
 <body>
-    <header>
-        <h1>Interest-Free Bill Tracker</h1>
-        <div class="app-actions">
-            <button id="export-data-btn">Export Data</button>
-            <button id="import-data-btn">Import Data</button>
-            <input type="file" id="import-file" accept=".json" style="display: none;">
-        </div>
-    </header>
+    <div class="app-container">
+        <!-- App Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Finance Tracker</h1>
+                <div class="app-actions">
+                    <button id="theme-toggle-btn" class="app-btn app-btn-secondary">
+                        <span class="theme-icon dark-icon"></span>
+                        Dark Mode
+                    </button>
+                    <button id="export-all-btn" class="app-btn app-btn-secondary">Export All</button>
+                    <button id="import-all-btn" class="app-btn app-btn-secondary">Import All</button>
+                    <input type="file" id="import-file" accept=".json" style="display: none;">
+                </div>
+            </div>
+            
+            <!-- Mobile Tab Navigation -->
+            <div class="mobile-tabs">
+                <button id="interest-free-tab" class="tab-btn active">Interest-Free Tracker</button>
+                <button id="bill-planner-tab" class="tab-btn">Bill Planner</button>
+            </div>
+        </header>
 
-    <div class="new-period-controls">
-        <div class="form-row">
-            <label for="start-date">Start Date:</label>
-            <input type="date" id="start-date">
-            <label for="end-date">End Date:</label>
-            <input type="date" id="end-date">
-            <label for="interest-free-days">Interest-Free Days:</label>
-            <input type="number" id="interest-free-days" value="55" min="1" max="365">
-        </div>
-        <div class="form-row">
-            <button id="add-period-btn">Add Default Billing Period</button>
-            <button id="create-custom-period-btn">Create Custom Period</button>
-        </div>
-    </div>
+        <!-- Main Content Container -->
+        <div class="dual-panel-container">
+            <!-- Interest-Free Tracker Panel -->
+            <div class="panel" id="interest-free-panel">
+                <div class="panel-content">
+                    <div class="app-card new-period-controls">
+                        <div class="form-row">
+                            <label for="start-date">Start Date:</label>
+                            <input type="date" id="start-date">
+                            <label for="end-date">End Date:</label>
+                            <input type="date" id="end-date">
+                            <label for="interest-free-days">Interest-Free Days:</label>
+                            <input type="number" id="interest-free-days" value="55" min="1" max="365">
+                        </div>
+                        <div class="form-row">
+                            <button id="add-period-btn" class="app-btn app-btn-primary">Add Default Billing Period</button>
+                            <button id="create-custom-period-btn" class="app-btn app-btn-primary">Create Custom Period</button>
+                        </div>
+                    </div>
 
-    <div id="billing-periods">
-        <!-- Billing periods will be added here dynamically -->
-    </div>
+                    <div id="billing-periods">
+                        <!-- Billing periods will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bill Planner Panel -->
+            <div id="bill-planner-panel" class="panel">
+                <div class="panel-content">
+                    <!-- Financial Overview Section -->
+                    <div class="app-card financial-overview">
+                        <h2>Financial Overview</h2>
+                        <div id="financial-chart-container">
+                            <canvas id="financial-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Forms Section - Side by Side -->
+                    <div class="bill-planner-forms">
+                        <!-- Pay Cycle Form -->
+                        <div class="app-card form-section">
+                            <h2>Set Pay Cycle</h2>
+                            <div class="app-form-group">
+                                <label for="payCycleStart">Start Date:</label>
+                                <input type="date" id="payCycleStart" class="form-control">
+                            </div>
+                            <div class="app-form-group">
+                                <label for="payCycleFrequency">Frequency:</label>
+                                <select id="payCycleFrequency" class="form-control">
+                                    <option value="Fortnightly">Fortnightly</option>
+                                    <option value="Monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="app-form-group">
+                                <label for="payCycleIncome">Income per Pay Cycle:</label>
+                                <div class="app-input-with-prefix">
+                                    <span class="app-input-prefix">$</span>
+                                    <input type="number" id="payCycleIncome" class="form-control" step="0.01">
+                                </div>
+                            </div>
+                            <button onclick="setPayCycle()" class="app-btn app-btn-primary">Set Pay Cycle</button>
+                        </div>
+                        
+                        <!-- Add Bill Form -->
+                        <div class="app-card form-section">
+                            <h2>Add a New Bill</h2>
+                            <div class="app-form-group">
+                                <label for="billName">Name:</label>
+                                <input type="text" id="billName" class="form-control">
+                            </div>
+                            <div class="app-form-group">
+                                <label for="billAmount">Amount:</label>
+                                <div class="app-input-with-prefix">
+                                    <span class="app-input-prefix">$</span>
+                                    <input type="number" id="billAmount" class="form-control" step="0.01">
+                                </div>
+                            </div>
+                            <div class="app-form-group">
+                                <label for="billDate">Date:</label>
+                                <input type="date" id="billDate" class="form-control">
+                            </div>
+                            <div class="app-form-group">
+                                <label for="billFrequency">Frequency:</label>
+                                <select id="billFrequency" class="form-control">
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Fortnightly">Fortnightly</option>
+                                    <option value="Yearly">Yearly</option>
+                                    <option value="6-Monthly">6-Monthly</option>
+                                    <option value="One-Off">One-Off</option>
+                                    <option value="Custom">Custom</option>
+                                </select>
+                            </div>
+                            <div class="app-form-group">
+                                <label for="billGroup">Group:</label>
+                                <select id="billGroup" class="form-control">
+                                    <option value="Group 1 - 2Up">Group 1 - 2Up</option>
+                                    <option value="Group 2 - Utilities">Group 2 - Utilities</option>
+                                    <option value="Group 3 - Subscriptions">Group 3 - Subscriptions</option>
+                                    <option value="Group 4 - Other">Group 4 - Other</option>
+                                </select>
+                            </div>
+                            <button onclick="addBill()" class="app-btn app-btn-primary add-bill-btn">
+                                <span class="material-icons-round">add</span> Add Bill
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Master Bill List Section -->
+                    <div class="master-bill-section">
+                        <div class="section-header master-bill-header">
+                            <h2>Master Bill List</h2>
+                            <button id="toggleMasterList" class="app-btn app-btn-icon toggle-btn">
+                                <span class="material-icons-round">visibility_off</span>
+                                <span class="btn-text">Hide List</span>
+                            </button>
+                        </div>
+                        <div id="masterListContainer">
+                            <ul id="masterList" class="bill-list"></ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Pay Cycles Section -->
+                    <div class="pay-cycles-section">
+                        <div class="section-header pay-cycles-header">
+                            <h2>Pay Cycles</h2>
+                            <button id="toggleAllCycles" class="app-btn app-btn-icon toggle-btn">
+                                <span class="material-icons-round">expand_less</span>
+                                <span class="btn-text">Collapse All</span>
+                            </button>
+                        </div>
+                        <div id="payCycles" class="pay-cycles-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Transaction Modal -->
-    <div id="transaction-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Add Transaction</h2>
-            <form id="transaction-form">
-                <div class="form-group">
-                    <label for="transaction-date">Date:</label>
-                    <input type="date" id="transaction-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="transaction-amount">Amount:</label>
-                    <input type="number" step="0.01" id="transaction-amount" required>
-                </div>
-                <div class="form-group">
-                    <label for="transaction-description">Description:</label>
-                    <input type="text" id="transaction-description" placeholder="Optional">
-                </div>
-                <button type="submit">Add Transaction</button>
-            </form>
+        <!-- Transaction Modal -->
+        <div id="transaction-modal" class="app-modal modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Add Transaction</h2>
+                <form id="transaction-form">
+                    <div class="app-form-group">
+                        <label for="transaction-date">Date:</label>
+                        <input type="date" id="transaction-date" required>
+                    </div>
+                    <div class="app-form-group">
+                        <label for="transaction-amount">Amount:</label>
+                        <input type="number" step="0.01" id="transaction-amount" required>
+                    </div>
+                    <div class="app-form-group">
+                        <label for="transaction-description">Description:</label>
+                        <input type="text" id="transaction-description" placeholder="Optional">
+                    </div>
+                    <button type="submit" class="app-btn app-btn-primary">Add Transaction</button>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- Payment Modal -->
-    <div id="payment-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Add Payment</h2>
-            <form id="payment-form">
-                <div class="form-group">
-                    <label for="payment-date">Date:</label>
-                    <input type="date" id="payment-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="payment-amount">Amount:</label>
-                    <input type="number" step="0.01" id="payment-amount" required>
-                </div>
-                <div class="form-group">
-                    <label for="payment-description">Description:</label>
-                    <input type="text" id="payment-description" placeholder="Optional">
-                </div>
-                <button type="submit">Add Payment</button>
-            </form>
+        <!-- Payment Modal -->
+        <div id="payment-modal" class="app-modal modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Add Payment</h2>
+                <form id="payment-form">
+                    <div class="app-form-group">
+                        <label for="payment-date">Date:</label>
+                        <input type="date" id="payment-date" required>
+                    </div>
+                    <div class="app-form-group">
+                        <label for="payment-amount">Amount:</label>
+                        <input type="number" step="0.01" id="payment-amount" required>
+                    </div>
+                    <div class="app-form-group">
+                        <label for="payment-description">Description:</label>
+                        <input type="text" id="payment-description" placeholder="Optional">
+                    </div>
+                    <button type="submit" class="app-btn app-btn-primary">Add Payment</button>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- Edit Period Modal -->
-    <div id="edit-period-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Edit Billing Period</h2>
-            <form id="edit-period-form">
-                <div class="form-group">
-                    <label for="edit-start-date">Start Date:</label>
-                    <input type="date" id="edit-start-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-end-date">End Date:</label>
-                    <input type="date" id="edit-end-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-interest-free-days">Interest-Free Days:</label>
-                    <input type="number" id="edit-interest-free-days" min="1" max="365" required>
-                </div>
-                <button type="submit">Save Changes</button>
-            </form>
+        <!-- Edit Period Modal -->
+        <div id="edit-period-modal" class="app-modal modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Edit Billing Period</h2>
+                <form id="edit-period-form">
+                    <div class="app-form-group">
+                        <label for="edit-start-date">Start Date:</label>
+                        <input type="date" id="edit-start-date" required>
+                    </div>
+                    <div class="app-form-group">
+                        <label for="edit-end-date">End Date:</label>
+                        <input type="date" id="edit-end-date" required>
+                    </div>
+                    <div class="app-form-group">
+                        <label for="edit-interest-free-days">Interest-Free Days:</label>
+                        <input type="number" id="edit-interest-free-days" min="1" max="365" required>
+                    </div>
+                    <button type="submit" class="app-btn app-btn-primary">Save Changes</button>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- App Install Prompt (hidden by default) -->
-    <div id="installPrompt" class="install-prompt" style="display:none;">
-        <div class="prompt-content">
-            <div class="prompt-icon">📱</div>
-            <div class="prompt-message">Add this app to your Home Screen for offline use. Tap <strong>Share</strong> ➔ <strong>Add to Home Screen</strong>.</div>
-            <button class="prompt-close" onclick="hideInstallPrompt()">Got it</button>
+        <!-- Custom Frequency Modal -->
+        <div id="customFrequencyModal" class="app-modal modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Custom Frequency</h2>
+                
+                <div class="frequency-option">
+                    <label for="customFrequencyValue">Repeat every:</label>
+                    <div class="frequency-inputs">
+                        <input type="number" id="customFrequencyValue" min="1" value="1">
+                        <select id="customFrequencyUnit">
+                            <option value="days">Day(s)</option>
+                            <option value="weeks">Week(s)</option>
+                            <option value="months">Month(s)</option>
+                            <option value="years">Year(s)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="frequency-option" id="weekdaySelector" style="display:none;">
+                    <label>On:</label>
+                    <div class="weekday-buttons">
+                        <button type="button" class="weekday-btn" data-day="0">Su</button>
+                        <button type="button" class="weekday-btn" data-day="1">Mo</button>
+                        <button type="button" class="weekday-btn" data-day="2">Tu</button>
+                        <button type="button" class="weekday-btn" data-day="3">We</button>
+                        <button type="button" class="weekday-btn" data-day="4">Th</button>
+                        <button type="button" class="weekday-btn" data-day="5">Fr</button>
+                        <button type="button" class="weekday-btn" data-day="6">Sa</button>
+                    </div>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button class="app-btn" id="cancelCustomFrequency">Cancel</button>
+                    <button class="app-btn app-btn-primary" id="saveCustomFrequency">Save</button>
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <!-- Offline Notification (hidden by default) -->
-    <div id="offlineNotification" class="app-notification notification-warning" style="display:none;">
-        <div class="notification-content">
-            <span>You are currently offline. Changes will be saved locally.</span>
-            <button class="close-notification" onclick="hideOfflineNotification()">×</button>
+
+        <!-- Import/Export Modals -->
+        <div id="import-modal" class="app-modal modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Import Data</h2>
+                <p>Choose which data you want to import:</p>
+                <div class="import-options">
+                    <button id="import-interest-free-btn" class="app-btn app-btn-primary">Interest-Free Tracker</button>
+                    <button id="import-bill-planner-btn" class="app-btn app-btn-primary">Bill Planner</button>
+                    <button id="import-both-btn" class="app-btn app-btn-primary">Import Both</button>
+                </div>
+            </div>
         </div>
+        
+        <div id="export-modal" class="app-modal modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Export Data</h2>
+                <p>Choose which data you want to export:</p>
+                <div class="export-options">
+                    <button id="export-interest-free-btn" class="app-btn app-btn-primary">Interest-Free Tracker</button>
+                    <button id="export-bill-planner-btn" class="app-btn app-btn-primary">Bill Planner</button>
+                    <button id="export-both-btn" class="app-btn app-btn-primary">Export Both</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div id="offlineNotification" class="app-notification notification-warning" style="display:none;">
+            <div class="notification-content">
+                <span>You are currently offline. Changes will be saved locally.</span>
+                <button class="close-notification" onclick="hideOfflineNotification()">×</button>
+            </div>
+        </div>
+        
+        <div id="snackbar"></div>
     </div>
 
     <!-- Link to JavaScript files -->
-    <script src="./app.js"></script>
-    <script src="./offline.js"></script>
+    <script src="./combined.js"></script>
     
     <!-- Service Worker Registration -->
     <script>
-      // Register service worker for offline support
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Get the base path of the site
-          const basePath = location.pathname.replace(/\/[^/]*$/, '/');
-          
-          // Register the service worker with the correct path
           navigator.serviceWorker.register('./service-worker.js')
             .then(registration => {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
