@@ -2,170 +2,176 @@
 <html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interest-Free Bill Tracker</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" href="./icons/icon-72x72.png">
-    
-    <!-- Link to external CSS file -->
-    <link rel="stylesheet" href="./styles.css">
-    
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="./manifest.json">
-    
-    <!-- iOS Support -->
+    <!-- Favicon to prevent 404 error -->
+    <link rel="icon" href="data:,">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'SF Pro', 'system-ui', 'sans-serif'],
+                        mono: ['SF Mono', 'ui-monospace', 'monospace']
+                    },
+                    colors: {
+                        primary: {
+                            light: '#8a70d6',
+                            DEFAULT: '#6b4ce6',
+                            dark: '#5a3dd4'
+                        },
+                        accent: {
+                            green: '#34C759',
+                            red: '#ff3b30',
+                            yellow: '#FFCC00',
+                            orange: '#FF9500'
+                        },
+                        light: {
+                            background: '#f8f9fa',
+                            surface: '#FFFFFF',
+                            card: '#FFFFFF',
+                            text: '#1D1D1F',
+                            textSecondary: '#86868B'
+                        },
+                        dark: {
+                            background: '#121212',
+                            surface: '#1E1E1E',
+                            card: '#252525',
+                            text: '#E5E5E7',
+                            textSecondary: '#AEAEB2'
+                        },
+                        ui: {
+                            divider: '#E5E5EA',
+                            input: '#F2F2F7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Styles for non-Tailwind elements -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Bill Tracker">
-    
-    <!-- iOS icons -->
-    <link rel="apple-touch-icon" href="./icons/icon-72x72.png" sizes="72x72">
-    <link rel="apple-touch-icon" href="./icons/icon-96x96.png" sizes="96x96">
-    <link rel="apple-touch-icon" href="./icons/icon-128x128.png" sizes="128x128">
-    <link rel="apple-touch-icon" href="./icons/icon-144x144.png" sizes="144x144">
-    <link rel="apple-touch-icon" href="./icons/icon-152x152.png" sizes="152x152">
-    <link rel="apple-touch-icon" href="./icons/icon-192x192.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="./icons/icon-384x384.png" sizes="384x384">
-    <link rel="apple-touch-icon" href="./icons/icon-512x512.png" sizes="512x512">
-    
-    <!-- iOS splash screens -->
-    <link rel="apple-touch-startup-image" href="./icons/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="./icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="./icons/splash-1242x2208.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)">
-    <link rel="apple-touch-startup-image" href="./icons/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
-    
-    <!-- Meta theme color -->
-    <meta name="theme-color" content="#7b61ff">
+    <meta name="apple-mobile-web-app-title" content="Interest-Free Tracker">
+    <!-- Apple touch icons -->
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 </head>
-<body>
-    <header>
-        <h1>Interest-Free Bill Tracker</h1>
-        <div class="app-actions">
-            <button id="theme-toggle-btn">
-                <span class="theme-icon dark-icon"></span>
-                Dark Mode
-            </button>
-            <button id="export-data-btn">Export Data</button>
-            <button id="import-data-btn">Import Data</button>
-            <input type="file" id="import-file" accept=".json" style="display: none;">
-        </div>
-    </header>
+<body class="bg-light-background dark:bg-dark-background text-light-text dark:text-dark-text font-sans transition-colors duration-300">
+    <!-- Dark/Light Mode Toggle Button -->
+    <button id="themeToggle" aria-label="Toggle dark mode" class="fixed top-4 right-4 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text shadow-md transition-all ease-in-out duration-300 hover:scale-105">
+        <span id="themeIcon" class="material-icons-round">dark_mode</span>
+        <span id="themeText" class="hidden">Dark Mode</span>
+    </button>
 
-    <div class="new-period-controls">
-        <div class="form-row">
-            <label for="start-date">Start Date:</label>
-            <input type="date" id="start-date">
-            <label for="end-date">End Date:</label>
-            <input type="date" id="end-date">
-            <label for="interest-free-days">Interest-Free Days:</label>
-            <input type="number" id="interest-free-days" value="55" min="1" max="365">
+    <div class="container max-w-4xl mx-auto px-4 py-6">
+        <h1 class="text-3xl font-semibold mb-8 tracking-tight">Interest-Free Bill Tracker</h1>
+        
+        <!-- Add Billing Period Section -->
+        <div class="bg-light-surface dark:bg-dark-surface rounded-xl p-6 mb-6 shadow-md dark:shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 tracking-tight">Add Billing Period</h2>
+            <div class="mb-4">
+                <label for="startDate" class="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-2">Start Date:</label>
+                <input type="date" id="startDate" class="w-full h-12 px-4 rounded-lg border border-ui-divider dark:border-dark-card bg-ui-input dark:bg-dark-card backdrop-blur-md text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            </div>
+            
+            <div class="mb-4">
+                <label for="endDate" class="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-2">End Date:</label>
+                <input type="date" id="endDate" class="w-full h-12 px-4 rounded-lg border border-ui-divider dark:border-dark-card bg-ui-input dark:bg-dark-card backdrop-blur-md text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            </div>
+            
+            <div class="mb-4">
+                <label for="interestFreeDays" class="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-2">Interest-Free Days:</label>
+                <input type="number" id="interestFreeDays" placeholder="Enter interest-free days" class="w-full h-12 px-4 rounded-lg border border-ui-divider dark:border-dark-card bg-ui-input dark:bg-dark-card backdrop-blur-md text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            </div>
+            
+            <div class="flex gap-4">
+                <button id="addDefaultPeriodBtn" class="h-12 px-6 rounded-xl bg-primary hover:bg-primary-dark text-white font-medium flex items-center justify-center transition-all hover:scale-105 ease-in-out w-full">
+                    <span class="material-icons-round mr-2">add</span> Add Default Period
+                </button>
+                <button id="addCustomPeriodBtn" class="h-12 px-6 rounded-xl bg-ui-input dark:bg-dark-card text-light-text dark:text-dark-text font-medium flex items-center justify-center transition-all hover:bg-gray-100 dark:hover:bg-dark-surface ease-in-out w-full">
+                    <span class="material-icons-round mr-2">create</span> Custom Period
+                </button>
+            </div>
+            
+            <!-- Data Import/Export Section -->
+            <div class="flex flex-wrap gap-4 mt-6">
+                <button id="exportDataBtn" class="h-12 px-6 rounded-xl bg-ui-input dark:bg-dark-card text-light-text dark:text-dark-text font-medium flex items-center justify-center transition-all hover:bg-gray-100 dark:hover:bg-dark-surface ease-in-out flex-1">
+                    <span class="material-icons-round mr-2">download</span> Export Data
+                </button>
+                <input type="file" id="importFileInput" accept=".json" class="hidden">
+                <button id="importDataBtn" class="h-12 px-6 rounded-xl bg-ui-input dark:bg-dark-card text-light-text dark:text-dark-text font-medium flex items-center justify-center transition-all hover:bg-gray-100 dark:hover:bg-dark-surface ease-in-out flex-1">
+                    <span class="material-icons-round mr-2">upload</span> Import Data
+                </button>
+            </div>
         </div>
-        <div class="form-row">
-            <button id="add-period-btn">Add Default Billing Period</button>
-            <button id="create-custom-period-btn">Create Custom Period</button>
+        
+        <!-- Billing Periods List Section -->
+        <div class="bg-light-surface dark:bg-dark-surface rounded-xl p-6 shadow-md dark:shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 tracking-tight">Billing Periods</h2>
+            <div id="billingPeriodsList" class="space-y-4">
+                <!-- Billing periods will be dynamically added here -->
+            </div>
         </div>
     </div>
-
-    <div id="billing-periods">
-        <!-- Billing periods will be added here dynamically -->
-    </div>
-
+    
     <!-- Transaction Modal -->
-    <div id="transaction-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Add Transaction</h2>
-            <form id="transaction-form">
-                <div class="form-group">
-                    <label for="transaction-date">Date:</label>
-                    <input type="date" id="transaction-date" required>
+    <div id="transactionModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300">
+        <div class="bg-light-surface dark:bg-dark-surface rounded-2xl p-6 w-11/12 max-w-md mx-auto relative shadow-lg transition-transform duration-300 ease-in-out">
+            <span class="absolute top-4 right-5 text-2xl font-medium text-light-textSecondary hover:text-light-text dark:hover:text-dark-text cursor-pointer close">&times;</span>
+            <h2 class="text-2xl font-semibold mb-4 tracking-tight" id="transactionModalTitle">Add Transaction</h2>
+            
+            <div class="mb-4">
+                <label for="transactionDate" class="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-2">Date:</label>
+                <input type="date" id="transactionDate" class="w-full h-12 px-4 rounded-lg border border-ui-divider dark:border-dark-card bg-ui-input dark:bg-dark-card backdrop-blur-md text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            </div>
+            
+            <div class="mb-4">
+                <label for="transactionAmount" class="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-2">Amount:</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-light-textSecondary dark:text-dark-textSecondary font-medium">$</span>
+                    <input type="number" step="0.01" id="transactionAmount" class="w-full h-12 pl-8 pr-4 rounded-lg border border-ui-divider dark:border-dark-card bg-ui-input dark:bg-dark-card backdrop-blur-md text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
                 </div>
-                <div class="form-group">
-                    <label for="transaction-amount">Amount:</label>
-                    <input type="number" step="0.01" id="transaction-amount" required>
-                </div>
-                <div class="form-group">
-                    <label for="transaction-description">Description:</label>
-                    <input type="text" id="transaction-description" placeholder="Optional">
-                </div>
-                <button type="submit">Add Transaction</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Payment Modal -->
-    <div id="payment-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Add Payment</h2>
-            <form id="payment-form">
-                <div class="form-group">
-                    <label for="payment-date">Date:</label>
-                    <input type="date" id="payment-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="payment-amount">Amount:</label>
-                    <input type="number" step="0.01" id="payment-amount" required>
-                </div>
-                <div class="form-group">
-                    <label for="payment-description">Description:</label>
-                    <input type="text" id="payment-description" placeholder="Optional">
-                </div>
-                <button type="submit">Add Payment</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Edit Period Modal -->
-    <div id="edit-period-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Edit Billing Period</h2>
-            <form id="edit-period-form">
-                <div class="form-group">
-                    <label for="edit-start-date">Start Date:</label>
-                    <input type="date" id="edit-start-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-end-date">End Date:</label>
-                    <input type="date" id="edit-end-date" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-interest-free-days">Interest-Free Days:</label>
-                    <input type="number" id="edit-interest-free-days" min="1" max="365" required>
-                </div>
-                <button type="submit">Save Changes</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- App Install Prompt (hidden by default) -->
-    <div id="installPrompt" class="install-prompt" style="display:none;">
-        <div class="prompt-content">
-            <div class="prompt-icon">📱</div>
-            <div class="prompt-message">Add this app to your Home Screen for offline use. Tap <strong>Share</strong> ➔ <strong>Add to Home Screen</strong>.</div>
-            <button class="prompt-close" onclick="hideInstallPrompt()">Got it</button>
+            </div>
+            
+            <div class="mb-4">
+                <label for="transactionDescription" class="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-2">Description:</label>
+                <input type="text" id="transactionDescription" placeholder="Optional" class="w-full h-12 px-4 rounded-lg border border-ui-divider dark:border-dark-card bg-ui-input dark:bg-dark-card backdrop-blur-md text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+            </div>
+            
+            <div class="mb-4">
+                <label for="transactionType" class="block text-sm font-medium text-light-textSecondary dark:text-dark-textSecondary mb-2">Type:</label>
+                <select id="transactionType" class="w-full h-12 px-4 rounded-lg border border-ui-divider dark:border-dark-card bg-ui-input dark:bg-dark-card backdrop-blur-md text-light-text dark:text-dark-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                    <option value="expense">Expense</option>
+                    <option value="repayment">Repayment</option>
+                </select>
+            </div>
+            
+            <button id="addTransactionBtn" class="h-12 px-6 rounded-xl bg-primary hover:bg-primary-dark text-white font-medium flex items-center justify-center transition-all hover:scale-105 ease-in-out w-full">
+                Add Transaction
+            </button>
         </div>
     </div>
     
-    <!-- Offline Notification (hidden by default) -->
-    <div id="offlineNotification" class="app-notification notification-warning" style="display:none;">
-        <div class="notification-content">
-            <span>You are currently offline. Changes will be saved locally.</span>
-            <button class="close-notification" onclick="hideOfflineNotification()">×</button>
-        </div>
-    </div>
-
-    <!-- Link to JavaScript files -->
-    <script src="./app.js"></script>
-    <script src="./offline.js"></script>
+    <!-- Snackbar -->
+    <div id="snackbar" class="fixed left-1/2 -translate-x-1/2 bottom-8 min-w-[250px] p-4 rounded-lg bg-light-surface dark:bg-dark-surface text-light-text dark:text-dark-text shadow-lg text-center z-50 hidden"></div>
     
-    <!-- Service Worker Registration -->
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./service-worker.js')
+          navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
               console.log('ServiceWorker registration successful with scope: ', registration.scope);
             })
