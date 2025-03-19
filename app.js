@@ -718,20 +718,23 @@
         importData(event) {
             const file = event.target.files[0];
             if (!file) return;
-
+        
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
                     const importedData = JSON.parse(e.target.result);
-
-                    // Access the billing periods correctly
-                    const billingPeriods = importedData.billingPeriods;
-
+        
+                    // Check if importedData is an array (direct billing periods)
+                    // or an object with billingPeriods property
+                    const billingPeriods = Array.isArray(importedData) 
+                        ? importedData 
+                        : importedData.billingPeriods;
+        
                     // Validate the imported data structure
                     if (!Array.isArray(billingPeriods)) {
                         throw new Error('Imported data is not in the correct format');
                     }
-
+        
                     // Check if each period has the required properties
                     for (const period of billingPeriods) {
                         if (!period.id || !period.startDate || !period.endDate ||
@@ -739,13 +742,13 @@
                             throw new Error('One or more periods are missing required properties');
                         }
                     }
-
+        
                     if (confirm('This will replace all your current data. Are you sure you want to continue?')) {
-                        this.billingPeriods = billingPeriods; // Use the extracted array
-
+                        this.billingPeriods = billingPeriods;
+        
                         // Ensure all transactions have IDs
                         this.migrateTransactionsWithIds();
-
+        
                         this.saveBillingPeriods();
                         this.renderExistingBillingPeriods();
                         alert('Data imported successfully!');
@@ -753,16 +756,16 @@
                 } catch (error) {
                     alert(`Error importing data: ${error.message}`);
                 }
-
+        
                 // Clear the file input so the same file can be selected again
                 event.target.value = '';
             };
-
+        
             reader.onerror = () => {
                 alert('Error reading the file');
                 event.target.value = '';
             };
-
+        
             reader.readAsText(file);
         }
 
